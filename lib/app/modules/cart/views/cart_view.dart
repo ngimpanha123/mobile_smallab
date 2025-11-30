@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import '../../../constants/app_color.dart';
+import '../../../constants/app_font_size.dart';
+import '../../../constants/app_spacing.dart';
+import '../../../constants/app_widget_size.dart';
+
 import '../controllers/cart_controller.dart';
 import '../widgets/cart_item.dart';
 
@@ -11,41 +17,61 @@ class CartView extends GetView<CartController> {
     final controller = Get.find<CartController>();
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.lightBackground,
+
+      // ░░ TOP BAR (Matches OrderingView) ░░
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.lightBackground,
         leading: IconButton(
           onPressed: () => Get.back(),
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-        ),
-        title: const Text(
-          "បញ្ជីទំនិញ",
-          style: TextStyle(
-            fontSize: 20,
-            color: Colors.black,
-            fontWeight: FontWeight.w600,
+          icon: Icon(
+            Icons.arrow_back,
+            size: AppWidgetSize.iconLarge,
+            color: AppColors.primary,
           ),
         ),
         centerTitle: true,
+        title: Text(
+          "Order Item",
+          style: TextStyle(
+            fontSize: AppFontSize.titleLarge,
+            color: AppColors.lightTextPrimary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ),
 
       body: Column(
         children: [
+
+          // ░░ CART LIST (Same card layout as Ordering) ░░
           Expanded(
             child: Obx(() {
               if (controller.items.isEmpty) {
-                return const Center(
-                    child: Text("មិនមានទំនិញទេ", style: TextStyle(fontSize: 18))
+                return Center(
+                  child: Text(
+                    "No items in the cart",
+                    style: TextStyle(
+                      fontSize: AppFontSize.titleMedium,
+                      color: AppColors.lightTextSecondary,
+                    ),
+                  ),
                 );
               }
 
               return ListView(
-                padding: EdgeInsets.zero,
-                children: controller.items.keys.map((product) {
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppSpacing.paddingM,
+                  vertical: AppSpacing.paddingS,
+                ),
+                children: controller.items.entries.map((entry) {
+                  final product = entry.key;
+                  final qty = entry.value;
+
                   return CartItemWidget(
                     product: product,
-                    qty: controller.items[product]!,
+                    qty: qty,
                     onIncrease: () => controller.addItem(product),
                     onDecrease: () => controller.decreaseItem(product),
                     onDelete: () => controller.removeProduct(product),
@@ -55,11 +81,14 @@ class CartView extends GetView<CartController> {
             }),
           ),
 
-          // --------- FOOTER ----------
+          // ░░ BOTTOM SECTION (Total + Button) ░░
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            padding: EdgeInsets.symmetric(
+              horizontal: AppSpacing.paddingM,
+              vertical: AppSpacing.paddingSM,
+            ),
             decoration: const BoxDecoration(
-              color: Colors.white,
+              color: AppColors.lightBackground,
               border: Border(
                 top: BorderSide(color: Colors.black12),
               ),
@@ -69,50 +98,65 @@ class CartView extends GetView<CartController> {
                 // TOTAL ROW
                 Row(
                   children: [
-                    const Text(
-                      "តម្លៃសរុប",
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                    Text(
+                      "Total",
+                      style: TextStyle(
+                        fontSize: AppFontSize.titleMedium,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.lightTextPrimary,
+                      ),
                     ),
                     const Spacer(),
-                    Obx(() => Text(
-                      "${controller.total} ៛",
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green,
+                    Obx(
+                          () => Text(
+                        "${controller.total.value} ៛",
+                        style: TextStyle(
+                          fontSize: AppFontSize.headlineSmall,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.success,
+                        ),
                       ),
-                    )),
+                    ),
                   ],
                 ),
 
-                const SizedBox(height: 12),
+                SizedBox(height: AppSpacing.marginMedium),
 
-                // SUBMIT BUTTON
-                SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      final receipt = await controller.checkout();
-                      if (receipt != null) {
-                        Get.offNamed("/success", arguments: receipt);
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xff0C8CE9),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
+                // FULL-WIDTH PRIMARY BUTTON
+                GestureDetector(
+                  onTap: () async {
+                    final receipt = await controller.checkout();
+                    if (receipt != null) {
+                      Get.offNamed("/success", arguments: receipt);
+                    }
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.symmetric(
+                      vertical: AppSpacing.paddingSM,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.paddingL,
                       ),
                     ),
-                    child: const Text(
-                      "បញ្ជូន",
-                      style: TextStyle(fontSize: 17, color: Colors.white),
+                    child: Center(
+                      child: Text(
+                        "Checkout",
+                        style: TextStyle(
+                          fontSize: AppFontSize.titleMedium,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
-                )
+                ),
               ],
             ),
           ),
+          SizedBox(height: AppSpacing.marginXXL),
         ],
       ),
     );

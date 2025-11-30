@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../constants/app_color.dart';
+import '../../../constants/app_font_size.dart';
+import '../../../constants/app_spacing.dart';
+import '../../../constants/app_widget_size.dart';
 import '../../../config/app_config.dart';
 import '../../../data/models/cashier_product_model.dart';
 
@@ -21,96 +25,122 @@ class CartItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: const BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: Colors.black12),
-        ),
+      margin: EdgeInsets.only(bottom: AppSpacing.marginSmall),
+      padding: EdgeInsets.all(AppSpacing.paddingM),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceColor,
+        borderRadius: BorderRadius.circular(AppSpacing.paddingM),
+        border: Border.all(color: Colors.black12),
       ),
 
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+
           // IMAGE
           ClipRRect(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(AppSpacing.paddingS),
             child: Image.network(
               AppConfig.getImageUrl(product.image),
-              width: 55,
-              height: 55,
+              width: AppWidgetSize.imageSmall,
+              height: AppWidgetSize.imageSmall,
               fit: BoxFit.cover,
             ),
           ),
-          const SizedBox(width: 12),
 
-          // PRODUCT DETAILS
+          SizedBox(width: AppSpacing.marginMedium),
+
+          // INFO
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   "${product.type?.name ?? ''} | ${product.code}",
-                  style: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 13,
+                  style: TextStyle(
+                    fontSize: AppFontSize.bodySmall,
+                    color: AppColors.lightTextSecondary,
                   ),
                 ),
-                const SizedBox(height: 2),
+
+                SizedBox(height: AppSpacing.marginXS),
+
                 Text(
                   product.name ?? "",
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
+                  style: TextStyle(
+                    fontSize: AppFontSize.titleMedium,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.lightTextPrimary,
                   ),
                 ),
-                const SizedBox(height: 4),
+
+                SizedBox(height: AppSpacing.marginXS),
+
                 Text(
                   "${product.unitPrice} ៛",
-                  style: const TextStyle(
-                    color: Colors.green,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
+                  style: TextStyle(
+                    fontSize: AppFontSize.bodyMedium,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.success,
                   ),
                 ),
               ],
             ),
           ),
 
-          // QUANTITY CONTROL
+          SizedBox(width: AppSpacing.marginMedium),
+
+          // QUANTITY CONTROL (Same as Ordering)
           Row(
             children: [
-              _qtyButton(Icons.remove, onDecrease),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Text(qty.toString(),
-                    style: const TextStyle(fontSize: 16)),
+              _circleBtn(Icons.remove, onDecrease),
+
+              SizedBox(width: AppSpacing.marginSmall),
+
+              Text(
+                qty.toString(),
+                style: TextStyle(
+                  fontSize: AppFontSize.titleMedium,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              _qtyButton(Icons.add, onIncrease),
+
+              SizedBox(width: AppSpacing.marginSmall),
+
+              _circleBtn(Icons.add, onIncrease),
             ],
           ),
 
-          const SizedBox(width: 12),
+          SizedBox(width: AppSpacing.marginSmall),
 
-          // DELETE BUTTON
+          // DELETE
           GestureDetector(
             onTap: onDelete,
-            child: const Icon(Icons.delete, color: Colors.red),
+            child: Icon(
+              Icons.delete,
+              size: AppWidgetSize.iconMedium,
+              color: AppColors.error,
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _qtyButton(IconData icon, VoidCallback onTap) {
-    return Container(
-      padding: const EdgeInsets.all(3),
-      decoration: BoxDecoration(
-        color: const Color(0xffEEEEEE),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: InkWell(
-        onTap: onTap,
-        child: Icon(icon, size: 18),
+  Widget _circleBtn(IconData icon, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(AppSpacing.paddingXS),
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
+          color: AppColors.primary,
+        ),
+        child: Icon(
+          icon,
+          size: AppWidgetSize.iconSmall,
+          color: Colors.white,
+        ),
       ),
     );
   }

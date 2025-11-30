@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import '../../../constants/app_color.dart';
+import '../../../constants/app_font_size.dart';
+import '../../../constants/app_spacing.dart';
+import '../../../constants/app_widget_size.dart';
 import '../controllers/ordering_controller.dart';
 import '../../cart/controllers/cart_controller.dart';
 import '../../../widgets/product_item.dart';
@@ -12,51 +17,65 @@ class OrderingView extends GetView<OrderingController> {
     final cart = Get.find<CartController>();
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.lightBackground,
       body: SafeArea(
         child: Column(
           children: [
 
-            // ░░ TOP HEADER (Logo + bell + arrow) ░░
-            Container(
-              height: 60,
-              padding: const EdgeInsets.symmetric(horizontal: 18),
+            // ░░ TOP BAR ░░
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: AppSpacing.paddingM,
+                vertical: AppSpacing.paddingS,
+              ),
               child: Row(
                 children: [
                   Image.asset(
                     "assets/logo/posmobile1.png",
-                    height: 38,
+                    height: AppWidgetSize.logoSmall,
                   ),
                   const Spacer(),
-                  // Notification icon with red dot (as screenshot)
+
+                  // NOTIFICATION ICON
                   Stack(
                     alignment: Alignment.topRight,
                     children: [
-                      const Icon(Icons.notifications_none,
-                          size: 28, color: Colors.black87),
+                      Icon(
+                        Icons.notifications_none,
+                        size: AppWidgetSize.iconLarge,
+                        color: AppColors.iconColor,
+                      ),
                       Container(
                         width: 10,
                         height: 10,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           color: Colors.red,
-                          borderRadius: BorderRadius.circular(20),
+                          shape: BoxShape.circle,
                         ),
                       )
                     ],
                   ),
-                  const SizedBox(width: 18),
-                  const Icon(Icons.keyboard_arrow_down,
-                      size: 32, color: Colors.black87),
+                  SizedBox(width: AppSpacing.paddingS),
+
+                  Icon(
+                    Icons.keyboard_arrow_down,
+                    size: AppWidgetSize.iconXL,
+                    color: AppColors.iconColor,
+                  ),
                 ],
               ),
             ),
 
-            // ░░ CATEGORY FILTER TABS (Rounded Pills) ░░
+            SizedBox(height: AppSpacing.marginSmall),
+
+            // ░░ CATEGORY FILTER ░░
             Obx(() {
               return SizedBox(
-                height: 50,
+                height: 44, // fixed height as in Figma
                 child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppSpacing.paddingM,
+                  ),
                   scrollDirection: Axis.horizontal,
                   itemCount: controller.categories.length + 1,
                   itemBuilder: (_, i) {
@@ -70,28 +89,33 @@ class OrderingView extends GetView<OrderingController> {
                     return GestureDetector(
                       onTap: () => controller.selectCategory(i),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 10),
-                        margin: const EdgeInsets.only(right: 10),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: AppSpacing.paddingM,
+                          vertical: AppSpacing.paddingS,
+                        ),
+                        margin: EdgeInsets.only(
+                          right: AppSpacing.marginSmall,
+                        ),
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? const Color(0xFF0A75D7)
+                              ? AppColors.primary
                               : Colors.white,
+                          borderRadius:
+                          BorderRadius.circular(AppSpacing.paddingL),
                           border: Border.all(
                             color: isSelected
-                                ? const Color(0xFF0A75D7)
+                                ? AppColors.primary
                                 : Colors.grey.shade300,
                           ),
-                          borderRadius: BorderRadius.circular(22),
                         ),
                         child: Text(
                           label,
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: AppFontSize.titleSmall,
+                            fontWeight: FontWeight.w600,
                             color: isSelected
                                 ? Colors.white
-                                : Colors.black87,
-                            fontWeight: FontWeight.w600,
+                                : AppColors.lightTextPrimary,
                           ),
                         ),
                       ),
@@ -101,25 +125,31 @@ class OrderingView extends GetView<OrderingController> {
               );
             }),
 
-            const SizedBox(height: 8),
+            SizedBox(height: AppSpacing.marginSmall),
 
-            // ░░ PRODUCT LIST (Matches screenshot) ░░
+            // ░░ PRODUCT LIST ░░
             Expanded(
               child: Obx(() {
                 if (controller.isLoading.value) {
-                  return const Center(
-                      child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 }
 
                 if (controller.filteredProducts.isEmpty) {
-                  return const Center(
-                      child: Text("No products",
-                          style:
-                          TextStyle(color: Colors.grey, fontSize: 16)));
+                  return Center(
+                    child: Text(
+                      "No products available",
+                      style: TextStyle(
+                        fontSize: AppFontSize.bodyLarge,
+                        color: AppColors.lightTextSecondary,
+                      ),
+                    ),
+                  );
                 }
 
                 return ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppSpacing.paddingM,
+                  ),
                   itemCount: controller.filteredProducts.length,
                   itemBuilder: (_, index) {
                     return ProductItemWidget(
@@ -133,80 +163,82 @@ class OrderingView extends GetView<OrderingController> {
               }),
             ),
 
-            // ░░ FOOTER CART SECTION ░░
+            // ░░ FOOTER CART BAR ░░
             Obx(() {
-              final totalItems = cart.items.length;
-              final totalPrice = cart.total.value;
-
               return Container(
-                height: 78,
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 10),
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppSpacing.paddingM,
+                  vertical: AppSpacing.paddingSM,
+                ),
                 decoration: const BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.lightBackground,
                   border: Border(
                     top: BorderSide(color: Colors.black12),
                   ),
                 ),
-                child: Row(
-                  children: [
-                    // Left circle count EXACT like screenshot
-                    Container(
-                      height: 36,
-                      width: 36,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: const Color(0xFF0A75D7),
-                      ),
-                      child: Center(
-                        child: Text(
-                          totalItems.toString(),
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ),
+
+                // ⋙⋙ ENTIRE BLUE BAR IS TAPPABLE ⋘⋘
+                child: GestureDetector(
+                  onTap: () => Get.toNamed("/cart"),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppSpacing.paddingM,
+                      vertical: AppSpacing.paddingSM,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(AppSpacing.paddingM),
                     ),
 
-                    const SizedBox(width: 12),
-
-                    // Middle: total price
-                    Expanded(
-                      child: Text(
-                        "$totalPrice ៛",
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-
-                    // Button EXACT like screenshot
-                    SizedBox(
-                      height: 46,
-                      child: ElevatedButton(
-                        onPressed: () => Get.toNamed("/cart"),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF0A75D7),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(9),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 30, vertical: 10),
-                        ),
-                        child: const Text(
-                          "កន្ត្រកបញ្ជា",
-                          style: TextStyle(
-                            fontSize: 16,
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 36,
+                          height: 36,
+                          decoration: const BoxDecoration(
                             color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Text(
+                              cart.items.length.toString(),
+                              style: TextStyle(
+                                fontSize: AppFontSize.titleSmall,
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
+
+                        SizedBox(width: AppSpacing.marginMedium),
+
+                        Text(
+                          "Ordering Now",
+                          style: TextStyle(
+                            fontSize: AppFontSize.titleMedium,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+
+                        const Spacer(),
+
+                        Text(
+                          "${cart.total.value} ៛",
+                          style: TextStyle(
+                            fontSize: AppFontSize.headlineSmall,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               );
-            }),
+            })
+
           ],
         ),
       ),

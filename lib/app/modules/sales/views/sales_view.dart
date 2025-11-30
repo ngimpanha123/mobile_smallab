@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import '../../../constants/app_color.dart';
+import '../../../constants/app_font_size.dart';
+import '../../../constants/app_spacing.dart';
+import '../../../constants/app_widget_size.dart';
+
+import '../controllers/sales_controller.dart';
 import '../../../widgets/sale_item.dart';
-import '../controllers/sales_controller.dart'; // adjust path if different
 
 class SalesView extends GetView<SalesController> {
   const SalesView({super.key});
@@ -9,71 +15,142 @@ class SalesView extends GetView<SalesController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Sales'),
-        centerTitle: true,
-      ),
-      body: Column(
-        children: [
-          // Total today header
-          Obx(() {
-            return Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              color: Colors.grey.shade100,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      backgroundColor: AppColors.lightBackground,
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+
+            // ░░ TOP BAR (same as Ordering) ░░
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: AppSpacing.paddingM,
+                vertical: AppSpacing.paddingS,
+              ),
+              child: Row(
                 children: [
-                  const Text(
-                    'Today Total',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
+                  const Spacer(),
+
                   Text(
-                    '${controller.totalToday.value} ៛',
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green,
+                    "Sale",
+                    style: TextStyle(
+                      fontSize: AppFontSize.titleLarge,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.lightTextPrimary,
                     ),
                   ),
+
+                  const Spacer(),
+
+                  Icon(Icons.more_horiz,
+                      size: AppWidgetSize.iconLarge,
+                      color: AppColors.iconColor),
                 ],
               ),
-            );
-          }),
+            ),
 
-          const SizedBox(height: 4),
+            SizedBox(height: AppSpacing.marginSmall),
 
-          // List of sales (must be wrapped in Expanded)
-          Expanded(
-            child: Obx(() {
-              if (controller.isLoading.value) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              if (controller.sales.isEmpty) {
-                return const Center(
-                  child: Text('No sales found'),
-                );
-              }
-
-              return ListView.builder(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                itemCount: controller.sales.length,
-                itemBuilder: (_, i) {
-                  final sale = controller.sales[i];
-                  return SaleItemWidget(
-                    sale: sale,
-                    onTap: () => controller.openSaleDetail(sale.id!),
-                  );
-                },
+            // ░░ TOTAL SALES BLOCK ░░
+            Obx(() {
+              return Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(AppSpacing.paddingM),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border(
+                    bottom: BorderSide(color: Colors.black12),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Today's total",
+                      style: TextStyle(
+                        fontSize: AppFontSize.bodyMedium,
+                        color: AppColors.lightTextSecondary,
+                      ),
+                    ),
+                    SizedBox(height: AppSpacing.marginXS),
+                    Text(
+                      "${controller.totalToday.value} ៛",
+                      style: TextStyle(
+                        fontSize: AppFontSize.headlineSmall,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.success,
+                      ),
+                    ),
+                  ],
+                ),
               );
             }),
-          ),
-        ],
+
+            SizedBox(height: AppSpacing.marginSmall),
+
+            // ░░ SALES LIST ░░
+            Expanded(
+              child: Obx(() {
+                if (controller.isLoading.value) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (controller.sales.isEmpty) {
+                  return Center(
+                    child: Text(
+                      "មិនមានប្រវត្តិការលក់",
+                      style: TextStyle(
+                        fontSize: AppFontSize.bodyLarge,
+                        color: AppColors.lightTextSecondary,
+                      ),
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  padding: EdgeInsets.zero,
+                  itemCount: controller.groupedSales.length,
+                  itemBuilder: (_, i) {
+                    final group = controller.groupedSales[i];
+                    final date = group['date'];
+                    final list = group['items'];
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Section Header Date
+                        Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: AppSpacing.paddingM,
+                            vertical: AppSpacing.paddingS,
+                          ),
+                          color: AppColors.secondary,
+                          child: Text(
+                            date, // ex: "September 14"
+                            style: TextStyle(
+                              fontSize: AppFontSize.bodyLarge,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.lightTextPrimary,
+                            ),
+                          ),
+                        ),
+
+                        // Sales list under that date
+                        ...List.generate(list.length, (index) {
+                          return SaleItemWidget(
+                            sale: list[index],
+                            onTap: () => controller.openSaleDetail(list[index].id!),
+                          );
+                        }),
+                      ],
+                    );
+                  },
+                );
+              }),
+            ),
+          ],
+        ),
       ),
     );
   }

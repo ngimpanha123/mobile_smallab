@@ -7,13 +7,16 @@ class StorageService extends GetxService {
 
   late GetStorage _box;
 
+  // Initialize storage
   Future<StorageService> init() async {
     await GetStorage.init();
     _box = GetStorage();
     return this;
   }
 
-  // ---------------- TOKEN ----------------
+  // ========================================================
+  // TOKEN MANAGEMENT
+  // ========================================================
 
   Future<void> saveToken(String token) async {
     await _box.write(_tokenKey, token);
@@ -27,26 +30,45 @@ class StorageService extends GetxService {
     await _box.remove(_tokenKey);
   }
 
-  bool get isLoggedIn => readToken() != null;
+  bool get isLoggedIn {
+    final token = readToken();
+    return token != null && token.isNotEmpty;
+  }
 
-  // ---------------- USER ----------------
+  // ========================================================
+  // USER DATA MANAGEMENT
+  // ========================================================
 
   Future<void> saveUser(Map<String, dynamic> data) async {
     await _box.write(_userKey, data);
   }
 
   Map<String, dynamic>? readUser() {
-    return _box.read(_userKey);
+    final data = _box.read(_userKey);
+    if (data == null) return null;
+    if (data is Map<String, dynamic>) return data;
+    return null;
   }
 
   Future<void> clearUser() async {
     await _box.remove(_userKey);
   }
 
-  // ---------------- LOGOUT ----------------
+  // ========================================================
+  // LOGOUT / CLEAR SESSION
+  // ========================================================
 
-  Future<void> logout() async {
+  /// Clears both token and user data.
+  /// Used when:
+  /// - Token expired (401 from API)
+  /// - Manually logout
+  Future<void> clearSession() async {
     await clearToken();
     await clearUser();
+  }
+
+  /// Alias for clearSession()
+  Future<void> logout() async {
+    await clearSession();
   }
 }

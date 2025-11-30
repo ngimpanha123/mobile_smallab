@@ -9,7 +9,7 @@ class ProfileProvider extends GetxService {
   ProfileProvider(this.dio);
 
   Future<Profile> getProfile() async {
-    final res = await dio.get("/api/account/profile");
+    final res = await dio.get("/api/account/profile/profile");
     return Profile.fromJson(res.data['data']);
   }
 

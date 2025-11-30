@@ -2,14 +2,13 @@ import 'package:dio/dio.dart';
 import 'package:get/get.dart' hide Response;
 
 import '../services/storage_service.dart';
+import '../../routes/app_routes.dart';
 
 class APIProvider extends GetxService {
   late Dio dio;
 
-  /// Base API URL (change to your backend)
   static const String baseUrl = "http://10.0.2.2:9003";
 
-  /// Constructor
   APIProvider() {
     dio = Dio(
       BaseOptions(
@@ -20,17 +19,14 @@ class APIProvider extends GetxService {
           "Accept": "application/json",
           "content-type": "application/json",
         },
-        // don't throw DioException for 4xx so we can handle 401 ourselves
-        validateStatus: (status) {
-          return status != null && status < 500;
-        },
+        validateStatus: (status) => status != null && status < 500,
       ),
     );
 
-    // Interceptors for logging & token injection
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
+          // Attach token if exists
           final token = _getToken();
           if (token != null && token.isNotEmpty) {
             options.headers["Authorization"] = "Bearer $token";
@@ -42,97 +38,103 @@ class APIProvider extends GetxService {
 
           return handler.next(options);
         },
-        onResponse: (response, handler) {
+
+        onResponse: (response, handler) async {
           print("⬅️ RESPONSE: ${response.statusCode}");
           print("BODY: ${response.data}");
+
+          // -------------------------------
+          // TOKEN EXPIRED HANDLING (401)
+          // -------------------------------
+          if (response.statusCode == 401) {
+            print("❌ Token Expired (401) → Logging out…");
+
+            final storage = Get.find<StorageService>();
+            await storage.clearSession();
+
+            Get.offAllNamed(Routes.LOGIN);
+            return; // Stop further processing
+          }
+
           return handler.next(response);
         },
-        onError: (e, handler) {
+
+        onError: (e, handler) async {
           print("❌ API ERROR: ${e.message}");
+
+          // DioError may also contain 401
+          if (e.response?.statusCode == 401) {
+            print("❌ 401 from DioError → logout…");
+
+            final storage = Get.find<StorageService>();
+            await storage.clearSession();
+            Get.offAllNamed(Routes.LOGIN);
+            return;
+          }
+
           return handler.next(e);
         },
       ),
     );
   }
 
-  /// Get token from StorageService
+  // Get stored token
   String? _getToken() {
     try {
-      final storage = Get.find<StorageService>();
-      return storage.readToken();
+      return Get.find<StorageService>().readToken();
     } catch (_) {
       return null;
     }
   }
 
-  // ======================================================
-  // UNIVERSAL REQUEST METHODS
-  // ======================================================
+  // ========================================================
+  // WRAPPER HTTP METHODS
+  // ========================================================
 
-  Future<Response> get(
-      String path, {
-        Map<String, dynamic>? query,
-      }) async {
+  Future<Response> get(String path, {Map<String, dynamic>? query}) async {
     return await dio.get(path, queryParameters: query);
   }
 
-  Future<Response> post(
-      String path, {
-        dynamic data,
-        Map<String, dynamic>? query,
-      }) async {
+  Future<Response> post(String path,
+      {dynamic data, Map<String, dynamic>? query}) async {
     return await dio.post(path, data: data, queryParameters: query);
   }
 
-  Future<Response> put(
-      String path, {
-        dynamic data,
-      }) async {
+  Future<Response> put(String path, {dynamic data}) async {
     return await dio.put(path, data: data);
   }
 
-  Future<Response> delete(
-      String path, {
-        Map<String, dynamic>? query,
-      }) async {
+  Future<Response> delete(String path, {Map<String, dynamic>? query}) async {
     return await dio.delete(path, queryParameters: query);
   }
 
-  // ======================================================
-  // *************** SPECIFIC API ENDPOINTS ***************
-  // ======================================================
+  // ========================================================
+  // *************** API ENDPOINTS ***************************
+  // ========================================================
 
-  // ---------------------- AUTH --------------------------
-
+  // -------- AUTH ----------
   Future<Response> login({
     required String username,
     required String password,
   }) async {
-    return await post(
-      "/api/account/auth/login",
-      data: {
-        "username": username,
-        "password": password,
-        "platform": "Mobile",
-      },
-    );
+    return await post("/api/account/auth/login", data: {
+      "username": username,
+      "password": password,
+      "platform": "Mobile",
+    });
   }
 
-  // ----------------- CASHIER / ORDERING -----------------
-
+  // -------- ORDERING ----------
   Future<Response> getOrderingProducts() async {
     return await get("/api/cashier/ordering/products");
   }
 
   Future<Response> sendOrder(List<int> cartProductIds) async {
-    return await post(
-      "/api/cashier/ordering/order",
-      query: {"cart": cartProductIds},
-    );
+    return await post("/api/cashier/ordering/order",
+        query: {"cart": cartProductIds});
   }
 
-  // ---------------------- SALES -------------------------
-
+  // -------- SALES ----------
   Future<Response> getSales({int page = 1}) async {
     return await get("/api/cashier/sales", query: {"page": page});
   }
@@ -145,104 +147,33 @@ class APIProvider extends GetxService {
     return await delete("/api/cashier/sales/$saleId");
   }
 
-  // ---------------------- LOGS --------------------------
-
+  // -------- LOGS ----------
   Future<Response> getUserLogs({int page = 1}) async {
     return await get("/api/cashier/logs", query: {"page": page});
   }
 
-  // ---------------------- PROFILE -----------------------
-
+  // -------- PROFILE ----------
   Future<Response> getProfile() async {
-    return await get("/api/account/profile");
+    return await get("/api/account/profile/profile");
   }
 
   Future<Response> updateProfile({
     required String name,
     required String phone,
   }) async {
-    return await post(
-      "/api/account/profile/update",
-      data: {
-        "name": name,
-        "phone": phone,
-      },
-    );
+    return await post("/api/account/profile/update", data: {
+      "name": name,
+      "phone": phone,
+    });
   }
 
   Future<Response> updatePassword({
     required String password,
     required String confirmPassword,
   }) async {
-    return await post(
-      "/api/account/profile/update-password",
-      data: {
-        "password": password,
-        "confirm_password": confirmPassword,
-      },
-    );
-  }
-
-  // ---------------------- ADMIN (Optional) -----------------------
-
-  Future<Response> getProducts({int? page, int? limit}) async {
-    Map<String, dynamic>? query;
-    if (page != null || limit != null) {
-      query = {};
-      if (page != null) query["page"] = page;
-      if (limit != null) query["limit"] = limit;
-    }
-    return await get("/api/admin/products", query: query);
-  }
-
-  Future<Response> getProductTypes() async {
-    return await get("/api/admin/product-types");
-  }
-
-  Future<Response> createProduct({
-    required String name,
-    required String code,
-    required String unitPrice,
-    required String typeId,
-    String? imageBase64,
-  }) async {
-    return await post(
-      "/api/admin/products",
-      data: {
-        "name": name,
-        "code": code,
-        "unit_price": unitPrice,
-        "type_id": typeId,
-        if (imageBase64 != null) "image": imageBase64,
-      },
-    );
-  }
-
-  Future<Response> updateProduct({
-    required int productId,
-    required String name,
-    required String code,
-    required String unitPrice,
-    required String typeId,
-    String? imageBase64,
-  }) async {
-    return await post(
-      "/api/admin/products/$productId/update",
-      data: {
-        "name": name,
-        "code": code,
-        "unit_price": unitPrice,
-        "type_id": typeId,
-        if (imageBase64 != null) "image": imageBase64,
-      },
-    );
-  }
-
-  Future<Response> deleteProduct({required int productId}) async {
-    return await delete("/api/admin/products/$productId");
-  }
-
-  Future<Response> deleteProductType({required int typeId}) async {
-    return await delete("/api/admin/product-types/$typeId");
+    return await post("/api/account/profile/update-password", data: {
+      "password": password,
+      "confirm_password": confirmPassword,
+    });
   }
 }

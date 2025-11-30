@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:mobile_eshop/app/data/models/cashier_order_model.dart';
 import 'dart:convert';
 
 import '../../../data/models/cashier_product_model.dart';
@@ -65,7 +66,7 @@ class CartController extends GetxController {
   //  "platform": "Mobile"
   //
   // ------------------------------------------------------
-  Future<String?> checkout() async {
+  /* Future<String?> checkout() async {
     if (items.isEmpty) return null;
 
     // Build map: { productId: qty }
@@ -79,7 +80,28 @@ class CartController extends GetxController {
     final receipt = await cashierProvider.sendOrder(cartMap);
 
     return receipt?.receiptNumber;
+  } */
+
+  Future<OrderData?> checkout() async {
+    if (items.isEmpty) return null;
+
+    // Build map: { productId: qty }
+    Map<String, int> cartMap = {};
+
+    items.forEach((product, qty) {
+      cartMap[(product.id ?? 0).toString()] = qty;
+    });
+
+    // Send order to API
+    final response = await cashierProvider.sendOrder(cartMap);
+
+    // Make sure it's not null
+    if (response == null) return null;
+
+    // Return entire backend JSON (SuccessView needs full data)
+    return response;
   }
+
 
   // ------------------------------------------------------
   // GET QUANTITY BY PRODUCT ID

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mobile_eshop/app/constants/app_color.dart';
 import '../controllers/sale_detail_controller.dart';
 import '../widgets/sale_detail_item.dart';
 
@@ -10,7 +11,8 @@ class SaleDetailView extends GetView<SaleDetailController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("ព័ត៌មានការលក់"),
+        title: const Text("Sales information"),
+        backgroundColor: AppColors.surfaceColor,
       ),
 
       body: Obx(() {

@@ -75,6 +75,7 @@ dependencies:
   firebase_messaging: ^14.7.10
   awesome_notifications: ^0.10.1
   get_storage: ^2.1.1
+  flutter_screenutil: ^5.9.3
 
 dev_dependencies:
   flutter_test:
