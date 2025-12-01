@@ -3,7 +3,7 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
-
+import 'dart:io';
 import '../models/cashier_product_model.dart';
 import '../models/cashier_order_model.dart';
 import '../models/cashier_sale_model.dart';
@@ -147,4 +147,27 @@ class CashierProvider extends GetxService {
       return false;
     }
   }
+
+  // ---------------------------------------------------------------------------
+  // 10) DOWNLOAD INVOICE PDF (Base64 → PDF file)
+  // ---------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  // GET INVOICE BASE64 (by receipt number)
+  // ---------------------------------------------------------------------------
+  Future<String?> getInvoiceBase64(String receiptNumber) async {
+    try {
+      final res = await dio.get("/api/share/print/order-invoice/$receiptNumber");
+
+      if (res.statusCode == 200 && res.data["data"] != null) {
+        return res.data["data"]; // Base64 string
+      } else {
+        print("❌ ERROR: ${res.data}");
+        return null;
+      }
+    } catch (e) {
+      print("❌ Invoice API Error: $e");
+      return null;
+    }
+  }
+
 }

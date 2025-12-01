@@ -8,7 +8,7 @@ class ChangePasswordView extends GetView<ChangePasswordController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("ប្ដូរលេខសម្ងាត់")),
+      appBar: AppBar(title: const Text("Change password")),
 
       body: Padding(
         padding: const EdgeInsets.all(20),

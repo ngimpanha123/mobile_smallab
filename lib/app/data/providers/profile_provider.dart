@@ -17,7 +17,7 @@ class ProfileProvider extends GetxService {
     required String name,
     required String phone,
   }) async {
-    final res = await dio.post("/api/account/profile/update", data: {
+    final res = await dio.put("/api/account/profile/update", data: {
       "name": name,
       "phone": phone,
     });
@@ -29,13 +29,20 @@ class ProfileProvider extends GetxService {
     required String password,
     required String confirmPassword,
   }) async {
-    final res =
-    await dio.post("/api/account/profile/update-password", data: {
-      "password": password,
-      "confirm_password": confirmPassword,
-    });
+    try {
+      final res = await dio.put(
+        "/api/account/profile/update-password",
+        data: {
+          "password": password,
+          "confirm_password": confirmPassword,
+        },
+      );
 
-    return res.statusCode == 200;
+      return res.statusCode == 200;
+    } catch (e) {
+      print("❌ Change Password Error: $e");
+      return false;
+    }
   }
 
   Future<CashierLog> getLogs({int page = 1}) async {

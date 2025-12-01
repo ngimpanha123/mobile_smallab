@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../cart/views/cart_view.dart';
 import '../controllers/home_controller.dart';
 
 import '../../ordering/views/ordering_view.dart';
 import '../../sales/views/sales_view.dart';
 import '../../profile/views/profile_view.dart';
 
+
 class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
 
   final pages = const [
     OrderingView(),
+    CartView(),
     SalesView(),
     ProfileView(),
+
   ];
 
   @override
@@ -33,6 +37,10 @@ class HomeView extends GetView<HomeController> {
               label: "Ordering",
             ),
             BottomNavigationBarItem(
+              icon: Icon(Icons.shopping_cart_outlined),
+              label: "Cart",
+            ),
+            BottomNavigationBarItem(
               icon: Icon(Icons.receipt_long),
               label: "Sales",
             ),
@@ -40,6 +48,7 @@ class HomeView extends GetView<HomeController> {
               icon: Icon(Icons.person),
               label: "Profile",
             ),
+
           ],
         ),
       ),
