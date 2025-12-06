@@ -55,8 +55,28 @@ class StorageService extends GetxService {
   }
 
   // ========================================================
-  // LOGOUT / CLEAR SESSION
-  // ========================================================
+// ROLES
+// ========================================================
+
+  Future<void> saveRoles(List<dynamic> roles) async {
+    // Convert to List<String>
+    final list = roles.map((e) => e.toString()).toList();
+    await _box.write("roles", list);
+  }
+
+  List<String> get userRoleNames {
+    final list = _box.read("roles");
+    if (list is List) {
+      return list.map((e) => e.toString()).toList();
+    }
+    return [];
+  }
+
+  bool hasRole(String role) {
+    return userRoleNames.contains(role.toLowerCase()) ||
+        userRoleNames.contains(role.toUpperCase());
+  }
+
 
   /// Clears both token and user data.
   /// Used when:

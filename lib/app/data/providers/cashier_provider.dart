@@ -161,7 +161,7 @@ class CashierProvider extends GetxService {
       if (res.statusCode == 200 && res.data["data"] != null) {
         return res.data["data"]; // Base64 string
       } else {
-        print("❌ ERROR: ${res.data}");
+        //print("❌ ERROR: ${res.data}");
         return null;
       }
     } catch (e) {

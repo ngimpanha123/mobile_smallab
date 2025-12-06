@@ -1,12 +1,12 @@
 import 'package:get/get.dart';
 
+import '../../user/cart/controllers/cart_controller.dart';
+import '../../user/ordering/controllers/ordering_controller.dart';
+import '../../user/profile/controllers/change_password_controller.dart';
+import '../../user/profile/controllers/logs_controller.dart';
+import '../../user/profile/controllers/profile_controller.dart';
+import '../../user/sales/controllers/sales_controller.dart';
 import '../controllers/home_controller.dart';
-import '../../ordering/controllers/ordering_controller.dart';
-import '../../cart/controllers/cart_controller.dart';
-import '../../sales/controllers/sales_controller.dart';
-import '../../profile/controllers/profile_controller.dart';
-import '../../profile/controllers/change_password_controller.dart';
-import '../../profile/controllers/logs_controller.dart';
 
 class HomeBinding extends Bindings {
   @override

@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../cart/views/cart_view.dart';
+import '../../user/cart/views/cart_view.dart';
+import '../../user/ordering/views/ordering_view.dart';
+import '../../user/profile/views/profile_view.dart';
+import '../../user/sales/views/sales_view.dart';
 import '../controllers/home_controller.dart';
-
-import '../../ordering/views/ordering_view.dart';
-import '../../sales/views/sales_view.dart';
-import '../../profile/views/profile_view.dart';
-
 
 class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
 
   final pages = const [
     OrderingView(),
-    CartView(),
     SalesView(),
     ProfileView(),
 
@@ -35,10 +32,6 @@ class HomeView extends GetView<HomeController> {
             BottomNavigationBarItem(
               icon: Icon(Icons.point_of_sale),
               label: "Ordering",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.shopping_cart_outlined),
-              label: "Cart",
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.receipt_long),

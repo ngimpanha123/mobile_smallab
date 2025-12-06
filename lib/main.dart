@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'app/data/providers/dashboard_provider.dart';
 import 'app/theme/app_theme.dart';
 import 'app/routes/app_pages.dart';
 import 'app/routes/app_routes.dart';
@@ -18,6 +19,7 @@ import 'app/data/services/storage_service.dart';
 import 'app/data/providers/api_provider.dart';
 import 'app/data/providers/cashier_provider.dart';
 import 'app/data/providers/profile_provider.dart';
+import 'app/data/providers/admin_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,6 +34,10 @@ Future<void> main() async {
   final api = Get.put(APIProvider());
   Get.put(CashierProvider(api.dio));
   Get.put(ProfileProvider(api.dio));
+
+  // Admin Provider
+  Get.put(AdminProvider(api.dio));
+  Get.put(AdminDashboardProvider(api.dio));
 
   runApp(const MyApp());
 }
@@ -60,7 +66,7 @@ class MyApp extends StatelessWidget {
       // If logged in → go Home
       // If not logged in → Login first
       initialRoute:
-      storage.isLoggedIn ? Routes.HOME : Routes.LOGIN,
+      storage.isLoggedIn ? Routes.LOGIN : Routes.LOGIN,
     );
   }
 }
