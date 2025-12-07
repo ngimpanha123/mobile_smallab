@@ -14,10 +14,10 @@ class _LoginViewState extends State<LoginView> {
   final LoginController controller = Get.put(LoginController());
 
   final TextEditingController _phoneController =
-  TextEditingController(text: "0966817805");
+  TextEditingController(text: "081642940");
 
   final TextEditingController _passwordController =
-  TextEditingController(text: "ngimpanha0");
+  TextEditingController(text: "mit642940");
 
   bool _obscurePassword = true;
 

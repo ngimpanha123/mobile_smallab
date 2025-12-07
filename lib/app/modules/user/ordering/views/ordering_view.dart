@@ -158,32 +158,44 @@ class OrderingView extends GetView<OrderingController> {
   Widget _categorySection() {
     return Obx(() {
       return SizedBox(
-        height: 42,
+        height: 46,
         child: ListView.separated(
           scrollDirection: Axis.horizontal,
           itemCount: controller.categories.length + 1,
-          separatorBuilder: (_, __) => SizedBox(width: 10),
+          padding: EdgeInsets.only(left: 4, right: 4),
+          separatorBuilder: (_, __) => SizedBox(width: 12),
           itemBuilder: (_, i) {
-            final selected = controller.selectedCategoryIndex.value == i;
+            final isSelected = controller.selectedCategoryIndex.value == i;
             final label = (i == 0) ? "All" : controller.categories[i - 1].name ?? "";
 
             return GestureDetector(
               onTap: () => controller.selectCategory(i),
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 decoration: BoxDecoration(
-                  color: selected ? AppColors.primary : Colors.white,
-                  borderRadius: BorderRadius.circular(20),
+                  color: isSelected ? AppColors.primary : Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(22),
                   border: Border.all(
-                    color: selected ? AppColors.primary : Colors.grey.shade300,
+                    color: isSelected ? AppColors.primary : Colors.grey.shade300,
+                    width: 1.2,
                   ),
+                  boxShadow: isSelected
+                      ? [
+                    BoxShadow(
+                      color: AppColors.primary.withOpacity(0.25),
+                      blurRadius: 8,
+                      offset: Offset(0, 3),
+                    ),
+                  ]
+                      : [],
                 ),
                 child: Text(
                   label,
                   style: TextStyle(
                     fontSize: AppFontSize.bodyMedium,
-                    color: selected ? Colors.white : AppColors.lightTextPrimary,
                     fontWeight: FontWeight.w600,
+                    color: isSelected ? Colors.white : AppColors.lightTextPrimary,
                   ),
                 ),
               ),
@@ -352,15 +364,15 @@ class OrderingView extends GetView<OrderingController> {
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         padding: EdgeInsets.symmetric(
-          horizontal: AppSpacing.paddingM,
-          vertical: AppSpacing.paddingS,
+          horizontal: 0,
+          vertical: 0,
         ),
 
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          childAspectRatio: 0.70,
+          crossAxisSpacing: 14,
+          mainAxisSpacing: 14,
+          childAspectRatio: 0.64,
         ),
 
         itemCount: items.length,
@@ -519,7 +531,6 @@ class OrderingView extends GetView<OrderingController> {
     );
   }
 
-
   Widget _buildQtyControl({
     required int qty,
     required VoidCallback onDecrease,
@@ -558,9 +569,6 @@ class OrderingView extends GetView<OrderingController> {
       ],
     );
   }
-
-
-
 
   Widget _bottomNav(CartController cart) {
     return Obx(() {

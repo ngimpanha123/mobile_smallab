@@ -14,6 +14,10 @@ class AppFontSize {
   static double get headlineMedium => _ratio.scaledFont(28);
   static double get headlineSmall => _ratio.scaledFont(24);
 
+  /// ⭐ NEW — Larger headline sizes
+  static double get headlineXL => _ratio.scaledFont(40);   // ~40px
+  static double get headlineXXL => _ratio.scaledFont(48);  // ~48px (optional)
+
   /// Title
   static double get titleLarge => _ratio.scaledFont(22);
   static double get titleMedium => _ratio.scaledFont(16);

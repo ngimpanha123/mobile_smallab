@@ -52,7 +52,7 @@ class ProductDetailView extends StatelessWidget {
                   children: [
                     // ------------------ PRODUCT IMAGE ------------------
                     Container(
-                      height: 260,
+                      height: 390,
                       width: double.infinity,
                       decoration: BoxDecoration(
                         color: Colors.white,

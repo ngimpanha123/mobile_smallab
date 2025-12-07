@@ -5,7 +5,7 @@ const color_icon = Color(0xFF0C7EA5);
 
 class AppColors {
   // Common colors
-  static const primary = Color(0xFF0c7ea5);
+  static const primary = Color(0xFF003D6B);  //0xFF0c7ea5
   static const secondary = Color(0xFF0b7195);
   static const success = Color(0xFF388E3C);
   static const error = Color(0xFFD32F2F);

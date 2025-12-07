@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mobile_eshop/app/constants/app_color.dart';
 import '../../user/cart/views/cart_view.dart';
 import '../../user/ordering/views/ordering_view.dart';
 import '../../user/profile/views/profile_view.dart';
@@ -24,7 +25,7 @@ class HomeView extends GetView<HomeController> {
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: controller.tabIndex.value,
           onTap: controller.changeTab,
-          selectedItemColor: Colors.blue,
+          selectedItemColor: AppColors.primary,
           unselectedItemColor: Colors.grey,
           showSelectedLabels: true,
           showUnselectedLabels: true,

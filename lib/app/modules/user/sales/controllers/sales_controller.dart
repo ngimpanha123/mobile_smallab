@@ -14,10 +14,27 @@ class SalesController extends GetxController {
   var isLoading = false.obs;
   var totalToday = 0.obs;
 
+  // RANGE FILTER
+  var rangeStart = Rxn<DateTime>();
+  var rangeEnd = Rxn<DateTime>();
+  var totalRange = 0.obs;
+
   @override
   void onInit() {
     super.onInit();
     fetchSales();
+  }
+
+  String formatTime(String? orderedAt) {
+    if (orderedAt == null) return "--:--";
+
+    try {
+      final dt = DateTime.parse(orderedAt).toLocal();
+      return DateFormat("hh:mm a").format(dt);
+    } catch (e) {
+      print("⛔ Time format error: $e | value: $orderedAt");
+      return "--:--";
+    }
   }
 
   // ===========================
@@ -66,6 +83,28 @@ class SalesController extends GetxController {
     }
 
     totalToday.value = sum;
+  }
+
+  void calculateRangeTotal() {
+    if (rangeStart.value == null || rangeEnd.value == null) {
+      totalRange.value = 0;
+      return;
+    }
+
+    int sum = 0;
+
+    for (final sale in sales) {
+      if (sale.orderedAt == null) continue;
+
+      final dt = DateTime.parse(sale.orderedAt!).toLocal();
+
+      if (dt.isAfter(rangeStart.value!) &&
+          dt.isBefore(rangeEnd.value!.add(const Duration(days: 1)))) {
+        sum += sale.totalPrice ?? 0;
+      }
+    }
+
+    totalRange.value = sum;
   }
 
   // ===========================
