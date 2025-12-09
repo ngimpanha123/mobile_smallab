@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'dart:io';
+import '../models/cashier_notification_model.dart';
 import '../models/cashier_product_model.dart';
 import '../models/cashier_order_model.dart';
 import '../models/cashier_sale_model.dart';
@@ -169,5 +170,28 @@ class CashierProvider extends GetxService {
       return null;
     }
   }
+
+  // ===========================
+// GET NOTIFICATIONS
+// ===========================
+  Future<List<CashierNotification>> getNotifications() async {
+    final res = await dio.get("/api/share/notifications");
+
+    if (res.statusCode == 200) {
+      final list = res.data["data"] as List;
+      return list.map((e) => CashierNotification.fromJson(e)).toList();
+    }
+
+    return [];
+  }
+
+// ===========================
+// DELETE NOTIFICATION
+// ===========================
+  Future<bool> deleteNotification(int id) async {
+    final res = await dio.delete("/api/share/notifications/$id");
+    return res.statusCode == 200 || res.statusCode == 204;
+  }
+
 
 }

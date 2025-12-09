@@ -14,6 +14,9 @@ class OrderingController extends GetxController {
   var filteredProducts = <ProductItem>[].obs;
   var allProducts = <ProductItem>[].obs;
 
+  // ⭐ NEW: favorites list
+  var favoriteProducts = <ProductItem>[].obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -37,6 +40,14 @@ class OrderingController extends GetxController {
     } finally {
       isLoading(false);
     }
+  }
+
+  // ==========================
+  // FAVORITES LOGIC
+  // ==========================
+
+  bool isFavorite(ProductItem item) {
+    return favoriteProducts.any((p) => p.id == item.id);
   }
 
   void selectCategory(int index) {

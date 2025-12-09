@@ -23,6 +23,9 @@ import '../modules/user/cart/views/cart_view.dart';
 import '../modules/user/ordering/bindings/ordering_binding.dart';
 import '../modules/user/ordering/views/ordering_view.dart';
 import '../modules/user/profile/bindings/profile_binding.dart';
+import '../modules/user/profile/controllers/change_password_controller.dart';
+import '../modules/user/profile/controllers/edit_profile_controller.dart';
+import '../modules/user/profile/controllers/logs_controller.dart';
 import '../modules/user/profile/views/change_password_view.dart';
 import '../modules/user/profile/views/edit_profile_view.dart';
 import '../modules/user/profile/views/logs_view.dart';
@@ -75,15 +78,26 @@ class AppPages {
     GetPage(
       name: Routes.EDIT_PROFILE,
       page: () => const EditProfileView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(() => EditProfileController());
+      }),
     ),
     GetPage(
       name: Routes.CHANGE_PASSWORD,
       page: () => const ChangePasswordView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(() => ChangePasswordController());
+      }),
     ),
+
     GetPage(
       name: Routes.LOGS,
       page: () => const LogsView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(() => LogsController());
+      }),
     ),
+
     GetPage(
       name: Routes.LOGIN,
       page: () => const LoginView(),

@@ -17,114 +17,121 @@ class ProfileView extends GetView<ProfileController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.lightBackground,
 
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
-        centerTitle: true,
-        title: const Text(
+        backgroundColor: AppColors.lightBackground,
+
+        // ❌ REMOVE THIS:
+        // centerTitle: true,
+
+        titleSpacing: AppSpacing.paddingM,
+        automaticallyImplyLeading: false,
+
+        title: Text(
           "Profile",
           style: TextStyle(
+            fontSize: AppFontSize.headlineLarge,
             fontWeight: FontWeight.bold,
-            fontSize: 18,
             color: AppColors.primary,
           ),
         ),
+
         actions: [
           IconButton(
-            icon: const Icon(Icons.more_horiz, size: 26, color: AppColors.primary),
-            onPressed: () => _openSettingsSheet(context),   // ✅ CALL BOTTOMSHEET HERE
+            icon: Icon(
+              Icons.more_horiz,
+              size: AppWidgetSize.iconMedium,
+              color: AppColors.primary,
+            ),
+            onPressed: () => _openSettingsSheet(),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: AppSpacing.paddingM),
         ],
       ),
 
-      body: SafeArea(
-        child: Obx(() {
-          if (controller.isLoading.value) {
-            return const Center(child: CircularProgressIndicator());
-          }
 
-          final profile = controller.profile.value;
-          if (profile == null) {
-            return const Center(child: Text("មិនមានទិន្នន័យអ្នកប្រើប្រាស់"));
-          }
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return Center(child: CircularProgressIndicator());
+        }
 
-          return SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(height: 12),
+        final profile = controller.profile.value;
+        if (profile == null) {
+          return Center(child: Text("មិនមានទិន្នន័យអ្នកប្រើប្រាស់"));
+        }
 
-                // ---------------- AVATAR ----------------
-                CircleAvatar(
-                  radius: 50,
-                  backgroundColor: Colors.grey.shade200,
-                  backgroundImage: NetworkImage(
-                    AppConfig.getImageUrl(profile.avatar),
-                  ),
+        return SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: AppSpacing.paddingM),
+          child: Column(
+            children: [
+              SizedBox(height: AppSpacing.marginMedium),
+
+              // =============== AVATAR ===============
+              CircleAvatar(
+                radius: AppWidgetSize.imageMedium,
+                backgroundColor: Colors.grey.shade200,
+                backgroundImage: NetworkImage(
+                  AppConfig.getImageUrl(profile.avatar),
                 ),
+              ),
 
-                SizedBox(height: 12),
+              SizedBox(height: AppSpacing.marginSM),
 
-                // ---------------- NAME ----------------
-                Text(
-                  profile.name ?? "",
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
-                  ),
+              // =============== NAME ===============
+              Text(
+                profile.name ?? "",
+                style: TextStyle(
+                  fontSize: AppFontSize.headlineSmall,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
                 ),
+              ),
 
-                SizedBox(height: 4),
+              SizedBox(height: AppSpacing.marginXS),
 
-                // ---------------- ROLE ----------------
-                Text(
-                  _defaultRole(profile),
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.error,
-                  ),
+              // =============== ROLE ===============
+              Text(
+                _defaultRole(profile),
+                style: TextStyle(
+                  fontSize: AppFontSize.bodyLarge,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.error,
                 ),
+              ),
 
-                SizedBox(height: 20),
+              SizedBox(height: AppSpacing.marginXL),
 
-                // ---------- USER INFORMATION ----------
-                _buildInfoCard(profile),
+              // =============== INFO CARD ===============
+              _buildInfoCard(profile),
+              SizedBox(height: AppSpacing.marginMedium),
 
-                SizedBox(height: 18),
-
-                // ---------- ROLES ----------
-                _buildRoleCard(profile),
-
-                SizedBox(height: 30),
-              ],
-            ),
-          );
-        }),
-      ),
+              // =============== ROLES CARD ===============
+              _buildRoleCard(profile),
+              SizedBox(height: AppSpacing.marginXL),
+            ],
+          ),
+        );
+      }),
     );
   }
 
-  // ===========================================================================
-  // MODERN INFO CARD UI
-  // ===========================================================================
+  // ---------------------------------------------------------------------------
+  // INFO CARD (Phone, Email, Join Date)
+  // ---------------------------------------------------------------------------
   Widget _buildInfoCard(Profile p) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      padding: EdgeInsets.all(AppSpacing.paddingL),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(AppSpacing.paddingM),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.06),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
+            offset: Offset(0, 4),
+            blurRadius: 12,
+          )
         ],
       ),
       child: Column(
@@ -142,15 +149,15 @@ class ProfileView extends GetView<ProfileController> {
   Widget _infoRow(IconData icon, String value) {
     return Row(
       children: [
-        Icon(icon, size: 22, color: AppColors.primary),
-        const SizedBox(width: 12),
+        Icon(icon, size: AppWidgetSize.iconMedium, color: AppColors.primary),
+        SizedBox(width: AppSpacing.marginMedium),
         Expanded(
           child: Text(
             value,
-            style: const TextStyle(
-              fontSize: 16,
-              color: AppColors.primary,
+            style: TextStyle(
+              fontSize: AppFontSize.bodyLarge,
               fontWeight: FontWeight.w600,
+              color: AppColors.lightTextPrimary,
             ),
           ),
         ),
@@ -160,185 +167,271 @@ class ProfileView extends GetView<ProfileController> {
 
   Widget _divider() {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Divider(color: Colors.grey.shade300, thickness: 1),
+      padding: EdgeInsets.symmetric(vertical: AppSpacing.marginSM),
+      child: Divider(color: Colors.grey.shade300),
     );
   }
 
-  // ===========================================================================
+  // ---------------------------------------------------------------------------
   // ROLE CARD
-  // ===========================================================================
+  // ---------------------------------------------------------------------------
   Widget _buildRoleCard(Profile p) {
+    final role = _defaultRole(p); // "Admin" or "Cashier"
+
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      padding: EdgeInsets.all(AppSpacing.paddingL),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(AppSpacing.paddingM),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.06),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
+            offset: Offset(0, 4),
+            blurRadius: 12,
+          )
         ],
       ),
       child: Column(
         children: [
-          _roleItem(Icons.person, "Administrators",
-              isSelected: _defaultRole(p) == "Admin"),
-          const SizedBox(height: 10),
-          _roleItem(Icons.account_circle_outlined, "User",
-              isSelected: _defaultRole(p) == "Cashier"),
+          // ADMIN ROLE
+          _roleRow(
+            title: "Administrators",
+            icon: Icons.star,
+            active: role == "Admin",
+            activeColor: Colors.red,        // Admin color 🔥
+          ),
+
+          SizedBox(height: AppSpacing.marginSmall),
+
+          // USER ROLE
+          _roleRow(
+            title: "User",
+            icon: Icons.person_outline,
+            active: role == "អ្នកគិតប្រាក់",
+            activeColor: Colors.blue,       // User color 🔵
+          ),
         ],
       ),
     );
   }
 
-  Widget _roleItem(IconData icon, String title, {bool isSelected = false}) {
+  Widget _roleRow({
+    required String title,
+    required IconData icon,
+    required bool active,
+    required Color activeColor,
+  }) {
     return Row(
       children: [
-        Icon(icon, size: 22, color: Colors.grey.shade800),
-        const SizedBox(width: 12),
+        Icon(
+          icon,
+          size: AppWidgetSize.iconMedium,
+          color: active ? activeColor : Colors.grey.shade500,
+        ),
+
+        SizedBox(width: AppSpacing.marginMedium),
+
         Expanded(
           child: Text(
             title,
-            style: const TextStyle(
-              fontSize: 16,
+            style: TextStyle(
+              fontSize: AppFontSize.bodyLarge,
               fontWeight: FontWeight.w600,
+              color: active ? activeColor : Colors.grey.shade800,
             ),
           ),
         ),
-        if (isSelected)
-          const Icon(Icons.check, size: 22, color: Colors.green),
+
+        if (active)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: activeColor.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.verified, size: 16, color: activeColor),
+                const SizedBox(width: 4),
+                Text(
+                  "Active",
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: activeColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
       ],
     );
   }
 
-  // ===========================================================================
-  // SETTINGS BOTTOMSHEET
-  // ===========================================================================
-  void _openSettingsSheet(BuildContext context) {
+
+
+  // ---------------------------------------------------------------------------
+  // SETTINGS BOTTOM SHEET
+  // ---------------------------------------------------------------------------
+  void _openSettingsSheet() {
+    final profile = controller.profile.value;
+
     Get.bottomSheet(
       Container(
-        padding: const EdgeInsets.symmetric(vertical: 20),
+        padding: EdgeInsets.symmetric(
+          horizontal: AppSpacing.paddingL,
+          vertical: AppSpacing.paddingM,
+        ),
         decoration: const BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(26)),
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(26),
+          ),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Drag handle
-            Container(
-              width: 45,
-              height: 5,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade400,
-                borderRadius: BorderRadius.circular(8),
+
+            // ======== Drag Handle ========
+            Center(
+              child: Container(
+                width: 45,
+                height: 5,
+                margin: const EdgeInsets.only(bottom: 14),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade400,
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             ),
 
-            const SizedBox(height: 16),
+            // ======== BIG TITLE ========
+            Text(
+              "Settings", // SETTINGS
+              style: TextStyle(
+                fontSize: AppFontSize.headlineMedium,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primary,
+              ),
+            ),
 
+            SizedBox(height: AppSpacing.marginSM),
+
+            // ======== PROFILE SETTINGS ========
             _sheetItem(
-              Icons.edit,
-              "Edit Profile",
-                  () {
-                final p = controller.profile.value;
-                if (p == null) {
-                  Get.snackbar("Error", "Profile is not loaded yet.");
-                  return;
-                }
-                Get.toNamed(Routes.EDIT_PROFILE, arguments: p);
-              },
+              Icons.edit_outlined,
+              "Edit information",
+                  () => Get.toNamed(Routes.EDIT_PROFILE, arguments: profile),
             ),
 
             _sheetItem(
-              Icons.lock,
+              Icons.lock_outline,
               "Change Password",
-                  () {
-                final p = controller.profile.value;
-                if (p == null) {
-                  Get.snackbar("Error", "Profile is not loaded yet.");
-                  return;
-                }
-                Get.toNamed(Routes.CHANGE_PASSWORD, arguments: p);
-              },
+                  () => Get.toNamed(Routes.CHANGE_PASSWORD, arguments: profile),
             ),
 
             _sheetItem(
               Icons.history,
-              "My Logs",
-                  () {
-                final p = controller.profile.value;
-                if (p == null) {
-                  Get.snackbar("Error", "Profile is not loaded yet.");
-                  return;
-                }
-                Get.toNamed(Routes.LOGIN, arguments: p);
-              },
+              "Activity History",
+                  () => Get.toNamed(Routes.LOGS),
             ),
 
+            SizedBox(height: AppSpacing.marginXS),
 
-            const Divider(height: 24),
+            const Divider(height: 1),
 
+            // ======== LOGOUT SECTION ========
             _sheetItem(
               Icons.logout,
-              "Logout",
+              "Leave",
                   () async {
-                Get.back();
                 final storage = Get.find<StorageService>();
                 await storage.clearSession();
-                Get.offAllNamed(Routes.LOGS);
+                Get.offAllNamed(Routes.LOGIN);
               },
               isDestructive: true,
             ),
 
-            const SizedBox(height: 10),
+            SizedBox(height: AppSpacing.marginXS),
           ],
         ),
       ),
-      barrierColor: Colors.black38,
+      barrierColor: Colors.black.withOpacity(0.25),
     );
   }
 
-  Widget _sheetItem(IconData icon, String label, VoidCallback onTap,
-      {bool isDestructive = false}) {
-    return ListTile(
-      leading: Icon(
-        icon,
-        size: 26,
-        color: isDestructive ? Colors.red: Colors.black87,
-      ),
-      title: Text(
-        label,
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          color: isDestructive ? Colors.red : Colors.black87,
+  Widget _sheetItem(
+      IconData icon,
+      String label,
+      VoidCallback onTap, {
+        bool isDestructive = false,
+      }) {
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          vertical: AppSpacing.paddingM,
+          horizontal: 4,
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: AppWidgetSize.iconLarge,
+              color: isDestructive ? Colors.red : AppColors.primary,
+            ),
+
+            SizedBox(width: AppSpacing.marginMedium),
+
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: AppFontSize.titleSmall,
+                  fontWeight: FontWeight.w600,
+                  color: isDestructive ? Colors.red : AppColors.primary,
+                ),
+              ),
+            ),
+
+            Icon(Icons.arrow_forward_ios_rounded,
+                size: 16,
+                color: isDestructive
+                    ? Colors.red
+                    : Colors.grey.shade400),
+          ],
         ),
       ),
-      onTap: onTap,
     );
   }
 
-  // ===========================================================================
+  // ---------------------------------------------------------------------------
   // HELPERS
-  // ===========================================================================
+  // ---------------------------------------------------------------------------
   String _defaultRole(Profile p) {
-    if (p.roles == null || p.roles!.isEmpty) return "Unknown";
+    if (p.roles == null || p.roles!.isEmpty) {
+      print("ROLE: Unknown");   // 🔍 print to console
+      return "Unknown";
+    }
 
     final def = p.roles!.firstWhere(
           (r) => r.userRoles?["is_default"] == true,
       orElse: () => p.roles!.first,
     );
 
-    return def.name ?? "Unknown";
+    final role = def.name ?? "Unknown";
+
+    // 🔥 PRINT ROLE TO CONSOLE
+    print("USER ROLE DETECTED: $role");
+
+    return role;
   }
 
   String _formatJoinDate(Profile p) {
     if (p.createdAt == null) return "-";
-    return p.createdAt!.replaceAll("T", " ").replaceAll("Z", "");
+    return p.createdAt!.split("T").first;
   }
 }

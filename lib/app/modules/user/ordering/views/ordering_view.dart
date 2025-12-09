@@ -7,9 +7,11 @@ import '../../../../constants/app_color.dart';
 import '../../../../constants/app_font_size.dart';
 import '../../../../constants/app_spacing.dart';
 import '../../../../constants/app_widget_size.dart';
+import '../controllers/notification_controller.dart';
 import '../controllers/ordering_controller.dart';
 import '../../cart/controllers/cart_controller.dart';
 import '../../../../widgets/product_item.dart';
+import '../widgets/notification_bottom_sheet.dart';
 
 class OrderingView extends GetView<OrderingController> {
   const OrderingView({super.key});
@@ -55,6 +57,8 @@ class OrderingView extends GetView<OrderingController> {
   // 🔹 MODERN HEADER
   // ---------------------------------------------------------------------------
   Widget _header() {
+    final notif = Get.put(NotificationController());
+
     return Row(
       children: [
         CircleAvatar(
@@ -62,7 +66,9 @@ class OrderingView extends GetView<OrderingController> {
           backgroundColor: Colors.grey.shade300,
           backgroundImage: const AssetImage("assets/logo/posmobile1.png"),
         ),
+
         SizedBox(width: 10),
+
         Text(
           "Hello 👋",
           style: TextStyle(
@@ -70,9 +76,49 @@ class OrderingView extends GetView<OrderingController> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        const Spacer(),
-        Icon(Icons.favorite_outline, size: AppWidgetSize.iconMedium),
+
+        Spacer(),
+
+        // NOTIFICATION ICON WITH BADGE
+        Obx(() {
+          int unread = notif.notifications
+              .where((e) => e.read == false)
+              .length;
+
+          return Stack(
+            children: [
+              IconButton(
+                icon: Icon(Icons.notifications_none,
+                    size: AppWidgetSize.iconMedium),
+                onPressed: () => NotificationBottomSheet.show(),
+              ),
+
+              if (unread > 0)
+                Positioned(
+                  right: 4,
+                  top: 4,
+                  child: Container(
+                    padding: EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(
+                      unread.toString(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          );
+        }),
+
         SizedBox(width: 16),
+
         Icon(Icons.shopping_cart_outlined, size: AppWidgetSize.iconMedium),
       ],
     );
