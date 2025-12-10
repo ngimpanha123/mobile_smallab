@@ -1,12 +1,13 @@
 import 'package:get/get.dart';
 import 'package:mobile_eshop/app/data/models/cashier_order_model.dart';
-import 'dart:convert';
 
 import '../../../../data/models/cashier_product_model.dart';
 import '../../../../data/providers/cashier_provider.dart';
+import '../../../../data/repositories/khqr_repository.dart';
 
 class CartController extends GetxController {
   final cashierProvider = Get.find<CashierProvider>();
+  final khqrRepo = Get.find<KhqrRepository>(); // ✅ FIXED
 
   var items = <ProductItem, int>{}.obs;
   var total = 0.obs;
@@ -59,49 +60,43 @@ class CartController extends GetxController {
   }
 
   // ------------------------------------------------------
-  // CHECKOUT — UPDATED ✔
-  // Backend expects:
-  //
-  //  "cart": "{\"1\":2,\"2\":3}",
-  //  "platform": "Mobile"
-  //
+  // NORMAL CHECKOUT (CASH)
   // ------------------------------------------------------
-  /* Future<String?> checkout() async {
-    if (items.isEmpty) return null;
+  Future<void> callNormalPayment() async {
+    if (items.isEmpty) return;
 
-    // Build map: { productId: qty }
     Map<String, int> cartMap = {};
-
-    items.forEach((product, qty) {
-      cartMap[(product.id ?? 0).toString()] = qty;
+    items.forEach((p, qty) {
+      cartMap[(p.id ?? 0).toString()] = qty;
     });
 
-    // Call provider
-    final receipt = await cashierProvider.sendOrder(cartMap);
+    final order = await cashierProvider.sendOrder(cartMap);
 
-    return receipt?.receiptNumber;
-  } */
-
-  Future<OrderData?> checkout() async {
-    if (items.isEmpty) return null;
-
-    // Build map: { productId: qty }
-    Map<String, int> cartMap = {};
-
-    items.forEach((product, qty) {
-      cartMap[(product.id ?? 0).toString()] = qty;
-    });
-
-    // Send order to API
-    final response = await cashierProvider.sendOrder(cartMap);
-
-    // Make sure it's not null
-    if (response == null) return null;
-
-    // Return entire backend JSON (SuccessView needs full data)
-    return response;
+    if (order != null) {
+      Get.offNamed("/user/success", arguments: order);
+    }
   }
 
+  // ------------------------------------------------------
+  // ✅ KHQR PAYMENT (FIXED)
+  // ------------------------------------------------------
+  Future<void> callKhqrPayment() async {
+    if (items.isEmpty) return;
+
+    Map<String, int> cartMap = {};
+    items.forEach((product, qty) {
+      cartMap[(product.id ?? 0).toString()] = qty;
+    });
+
+    final repo = Get.find<KhqrRepository>();
+    final result = await repo.generateKhqr(cartMap);
+
+    // ✅ ALWAYS pass MAP
+    Get.toNamed("/user/khqr", arguments: {
+      "result": result,
+      "cart": cartMap,
+    });
+  }
 
   // ------------------------------------------------------
   // GET QUANTITY BY PRODUCT ID

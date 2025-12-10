@@ -20,6 +20,10 @@ import '../modules/login/views/login_view.dart';
 import '../modules/login/views/login_view.dart';
 import '../modules/user/cart/bindings/cart_binding.dart';
 import '../modules/user/cart/views/cart_view.dart';
+import '../modules/user/khqr/bindings/user_khqr_binding.dart';
+import '../modules/user/khqr/views/khqr_expired_view.dart';
+import '../modules/user/khqr/views/khqr_success_view.dart';
+import '../modules/user/khqr/views/user_khqr_view.dart';
 import '../modules/user/ordering/bindings/ordering_binding.dart';
 import '../modules/user/ordering/views/ordering_view.dart';
 import '../modules/user/profile/bindings/profile_binding.dart';
@@ -31,6 +35,7 @@ import '../modules/user/profile/views/edit_profile_view.dart';
 import '../modules/user/profile/views/logs_view.dart';
 import '../modules/user/profile/views/profile_view.dart';
 import '../modules/user/sale_detail/bindings/sale_detail_binding.dart';
+import '../modules/user/sale_detail/controllers/sale_detail_controller.dart';
 import '../modules/user/sale_detail/views/sale_detail_view.dart';
 import '../modules/user/sales/bindings/sales_binding.dart';
 import '../modules/user/sales/views/sales_view.dart';
@@ -68,7 +73,9 @@ class AppPages {
     GetPage(
       name: Routes.SALE_DETAIL,
       page: () => const SaleDetailView(),
-      binding: SaleDetailBinding(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(() => SaleDetailController());
+      }),
     ),
     GetPage(
       name: Routes.PROFILE,
@@ -133,5 +140,21 @@ class AppPages {
       page: () => const AdminHomeView(),
       binding: AdminHomeBinding(),
     ),
+    GetPage(
+      name: "/user/khqr",
+      page: () => const KhqrView(),
+      binding: KhqrBinding(),
+    ),
+
+    GetPage(
+      name: "/user/khqr-success",
+      page: () => KhqrSuccessView(),
+    ),
+
+    GetPage(
+      name: "/user/khqr-expired",
+      page: () => KhqrExpiredView(),
+    ),
+
   ];
 }

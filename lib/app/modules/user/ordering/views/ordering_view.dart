@@ -56,7 +56,8 @@ class OrderingView extends GetView<OrderingController> {
   // ---------------------------------------------------------------------------
   // 🔹 MODERN HEADER
   // ---------------------------------------------------------------------------
-  Widget _header() {
+  Widget _header()
+  {
     final notif = Get.put(NotificationController());
 
     return Row(

@@ -80,6 +80,10 @@ dependencies:
   fl_chart: ^1.1.1
   open_filex: ^4.3.2
   path_provider: ^2.1.3
+  flutter_bakong_khqr: ^0.0.1+3
+  qr_flutter: ^4.1.0
+
+
 
 
 dev_dependencies:

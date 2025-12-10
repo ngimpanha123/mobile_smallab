@@ -21,5 +21,5 @@ abstract class Routes {
   static const ADMIN_SALES = '/admin/sales';
   static const ADMIN_USERS = '/admin/users';
   static const ADMIN_SETTINGS = '/admin/settings';
-
+  static const USER_KHQR = '/user/khqr';
 }

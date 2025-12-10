@@ -18,7 +18,7 @@ class CartView extends GetView<CartController> {
     return Scaffold(
       backgroundColor: AppColors.lightBackground,
 
-      // ░░ TOP BAR (Matches OrderingView) ░░
+      // ░░ TOP BAR ░░
       appBar: AppBar(
         elevation: 0,
         backgroundColor: AppColors.lightBackground,
@@ -44,7 +44,7 @@ class CartView extends GetView<CartController> {
       body: Column(
         children: [
 
-          // ░░ CART LIST (Same card layout as Ordering) ░░
+          // ░░ CART LIST ░░
           Expanded(
             child: Obx(() {
               if (controller.items.isEmpty) {
@@ -80,7 +80,7 @@ class CartView extends GetView<CartController> {
             }),
           ),
 
-          // ░░ BOTTOM SECTION (Total + Button) ░░
+          // ░░ BOTTOM SECTION (Total + Buttons) ░░
           Container(
             padding: EdgeInsets.symmetric(
               horizontal: AppSpacing.paddingM,
@@ -94,7 +94,8 @@ class CartView extends GetView<CartController> {
             ),
             child: Column(
               children: [
-                // TOTAL ROW
+
+                // ░░ TOTAL ROW ░░
                 Row(
                   children: [
                     Text(
@@ -121,13 +122,36 @@ class CartView extends GetView<CartController> {
 
                 SizedBox(height: AppSpacing.marginMedium),
 
-                // FULL-WIDTH PRIMARY BUTTON
+                // ░░ BUTTON: PAY WITH BAKONG KHQR ░░
+                // Pay with KHQR
+                GestureDetector(
+                  onTap: () async => controller.callKhqrPayment(),
+                  child: Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.symmetric(vertical: 14),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Center(
+                      child: Text(
+                        "Pay with Bakong KHQR",
+                        style: TextStyle(
+                          fontSize: AppFontSize.titleMedium,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: AppSpacing.marginMedium),
+
+                // ░░ BUTTON: NORMAL CHECKOUT ░░
                 GestureDetector(
                   onTap: () async {
-                    final receipt = await controller.checkout();
-                    if (receipt != null) {
-                      Get.offNamed("/user/success", arguments: receipt);
-                    }
+                    await controller.callNormalPayment();
                   },
                   child: Container(
                     width: double.infinity,
@@ -135,14 +159,14 @@ class CartView extends GetView<CartController> {
                       vertical: AppSpacing.paddingSM,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primary,
+                      color: AppColors.success,
                       borderRadius: BorderRadius.circular(
                         AppSpacing.paddingL,
                       ),
                     ),
                     child: Center(
                       child: Text(
-                        "Checkout",
+                        "Normal Checkout",
                         style: TextStyle(
                           fontSize: AppFontSize.titleMedium,
                           fontWeight: FontWeight.w600,
@@ -152,9 +176,11 @@ class CartView extends GetView<CartController> {
                     ),
                   ),
                 ),
+
               ],
             ),
           ),
+
           SizedBox(height: AppSpacing.marginXXL),
         ],
       ),

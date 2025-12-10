@@ -1,5 +1,8 @@
 import 'package:get/get.dart';
 
+import '../../../data/providers/cashier_provider.dart';
+import '../../../data/repositories/khqr_repository.dart';
+
 import '../../user/cart/controllers/cart_controller.dart';
 import '../../user/ordering/controllers/ordering_controller.dart';
 import '../../user/profile/controllers/change_password_controller.dart';
@@ -11,17 +14,45 @@ import '../controllers/home_controller.dart';
 class HomeBinding extends Bindings {
   @override
   void dependencies() {
-    // Main tab controller
-    Get.lazyPut<HomeController>(() => HomeController());
+    // ================================
+    // ✅ PROVIDERS (MUST COME FIRST)
+    // ================================
+    Get.lazyPut<CashierProvider>(
+          () => CashierProvider(Get.find()),
+      fenix: true,
+    );
 
-    // Tabs
-    Get.lazyPut<OrderingController>(() => OrderingController());
-    Get.lazyPut<CartController>(() => CartController());
-    Get.lazyPut<SalesController>(() => SalesController());
-    Get.lazyPut<ProfileController>(() => ProfileController());
+    // ================================
+    // ✅ KHQR REPOSITORY (CRITICAL FIX)
+    // ================================
+    Get.lazyPut<KhqrRepository>(
+          () => KhqrRepository(),
+      fenix: true,
+    );
 
-    // Profile-related
-    Get.lazyPut<ChangePasswordController>(() => ChangePasswordController());
-    Get.lazyPut<LogsController>(() => LogsController());
+    // ================================
+    // ✅ MAIN TAB CONTROLLER
+    // ================================
+    Get.lazyPut<HomeController>(() => HomeController(), fenix: true);
+
+    // ================================
+    // ✅ TAB CONTROLLERS
+    // ================================
+    Get.lazyPut<OrderingController>(() => OrderingController(), fenix: true);
+
+    // ✅ CartController now SAFE (KhqrRepository already exists)
+    Get.lazyPut<CartController>(() => CartController(), fenix: true);
+
+    Get.lazyPut<SalesController>(() => SalesController(), fenix: true);
+    Get.lazyPut<ProfileController>(() => ProfileController(), fenix: true);
+
+    // ================================
+    // ✅ PROFILE RELATED
+    // ================================
+    Get.lazyPut<ChangePasswordController>(
+            () => ChangePasswordController(),
+        fenix: true);
+
+    Get.lazyPut<LogsController>(() => LogsController(), fenix: true);
   }
 }

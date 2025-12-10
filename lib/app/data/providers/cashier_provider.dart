@@ -10,6 +10,7 @@ import '../models/cashier_order_model.dart';
 import '../models/cashier_sale_model.dart';
 import '../models/cashier_sale_view_model.dart';
 import '../models/cashier_log_model.dart';
+import '../models/khqr_model.dart';
 import '../models/profile_model.dart';
 
 class CashierProvider extends GetxService {
@@ -192,6 +193,61 @@ class CashierProvider extends GetxService {
     final res = await dio.delete("/api/share/notifications/$id");
     return res.statusCode == 200 || res.statusCode == 204;
   }
+
+
+
+// ==========================
+// ✅ GENERATE KHQR
+// ==========================
+  Future<Map<String, dynamic>> generateKhqr(Map<String, int> cart) async {
+    final res = await dio.post(
+      "/api/cashier/ordering/khqr/generate",
+      data: {
+        "cart": cart,
+        "platform": "Mobile",
+      },
+    );
+
+    if (res.statusCode == 200 || res.statusCode == 201) {
+      final data = res.data;
+      return {
+        "qr": data["qr"],
+        "md5": data["md5"],
+        "amount": data["total"], // backend sends total
+      };
+    }
+
+    throw Exception("Fail to generate KHQR → ${res.data}");
+  }
+
+// ==========================
+// ✅ CONFIRM KHQR PAYMENT
+// ==========================
+  Future<Map<String, dynamic>> confirmKhqr({
+    required String md5,
+    required Map<String, int> cart,
+  }) async {
+    final res = await dio.post(
+      "/api/cashier/ordering/khqr/confirm",
+      data: {
+        "md5": md5,
+        "cart": cart,
+        "platform": "Mobile",
+      },
+    );
+
+    if (res.statusCode == 200 || res.statusCode == 201) {
+      return res.data;
+    }
+
+    throw Exception("KHQR confirm failed → ${res.data}");
+  }
+
+
+
+
+
+
 
 
 }
