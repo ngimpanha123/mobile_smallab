@@ -48,6 +48,12 @@ class CartController extends GetxController {
     calculateTotal();
   }
 
+
+  void clearCart() {
+    items.clear();
+    total.value = 0;
+  }
+
   // ------------------------------------------------------
   // CALCULATE TOTAL
   // ------------------------------------------------------

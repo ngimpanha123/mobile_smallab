@@ -1,8 +1,6 @@
 import 'package:get/get.dart';
 
-import '../../../data/providers/cashier_provider.dart';
 import '../../../data/repositories/khqr_repository.dart';
-
 import '../../user/cart/controllers/cart_controller.dart';
 import '../../user/ordering/controllers/ordering_controller.dart';
 import '../../user/profile/controllers/change_password_controller.dart';
@@ -14,45 +12,15 @@ import '../controllers/home_controller.dart';
 class HomeBinding extends Bindings {
   @override
   void dependencies() {
-    // ================================
-    // ✅ PROVIDERS (MUST COME FIRST)
-    // ================================
-    Get.lazyPut<CashierProvider>(
-          () => CashierProvider(Get.find()),
-      fenix: true,
-    );
-
-    // ================================
-    // ✅ KHQR REPOSITORY (CRITICAL FIX)
-    // ================================
-    Get.lazyPut<KhqrRepository>(
-          () => KhqrRepository(),
-      fenix: true,
-    );
-
-    // ================================
-    // ✅ MAIN TAB CONTROLLER
-    // ================================
     Get.lazyPut<HomeController>(() => HomeController(), fenix: true);
-
-    // ================================
-    // ✅ TAB CONTROLLERS
-    // ================================
-    Get.lazyPut<OrderingController>(() => OrderingController(), fenix: true);
-
-    // ✅ CartController now SAFE (KhqrRepository already exists)
     Get.lazyPut<CartController>(() => CartController(), fenix: true);
-
+    Get.lazyPut<OrderingController>(() => OrderingController(), fenix: true);
     Get.lazyPut<SalesController>(() => SalesController(), fenix: true);
     Get.lazyPut<ProfileController>(() => ProfileController(), fenix: true);
 
-    // ================================
-    // ✅ PROFILE RELATED
-    // ================================
-    Get.lazyPut<ChangePasswordController>(
-            () => ChangePasswordController(),
-        fenix: true);
-
+    Get.lazyPut<ChangePasswordController>(() => ChangePasswordController(), fenix: true);
     Get.lazyPut<LogsController>(() => LogsController(), fenix: true);
+    Get.lazyPut<KhqrRepository>(() => KhqrRepository(), fenix: true);
+
   }
 }
