@@ -1,8 +1,11 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+
 import '../../../../config/app_config.dart';
 import '../../../../constants/app_color.dart';
+import '../../../../routes/app_routes.dart';
 import '../controllers/admin_sales_controller.dart';
 
 class AdminSalesView extends GetView<AdminSalesController> {
@@ -11,26 +14,69 @@ class AdminSalesView extends GetView<AdminSalesController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: AppColors.darkTextPrimary,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          side: BorderSide(color: AppColors.primary.withOpacity(0.2)),
+        ),
+        backgroundColor: AppColors.darkTextPrimary,
+        centerTitle: false,
+
         title: const Text(
           'Sales Management',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            color: AppColors.primary,
+          ),
         ),
+
         actions: [
-          IconButton(
-            icon: const Icon(Icons.filter_list, size: 26),
-            onPressed: _showFilterDialog,
+          // FILTER BUTTON
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(10),
+              onTap: _showFilterDialog,
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.10),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  Icons.filter_list,
+                  size: 22,
+                  color: AppColors.primary,
+                ),
+              ),
+            ),
           ),
-          IconButton(
-            icon: const Icon(Icons.refresh, size: 26),
-            onPressed: () => controller.refreshData(),
+
+          // REFRESH BUTTON
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(10),
+              onTap: controller.refreshData,
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.refresh,
+                  size: 22,
+                  color: Colors.black87,
+                ),
+              ),
+            ),
           ),
-          const SizedBox(width: 6),
         ],
       ),
+
 
       body: Obx(() {
         if (controller.isLoading.value) {
@@ -38,39 +84,34 @@ class AdminSalesView extends GetView<AdminSalesController> {
         }
 
         if (controller.hasError.value) {
-          return _buildErrorState();
+          return _errorState();
         }
 
-        return RefreshIndicator(
-          onRefresh: () => controller.refreshData(),
-          child: Column(
-            children: [
-              _buildFilterChips(),
-              _buildSalesStats(),
-              Expanded(child: _buildSalesList()),
-              _buildPagination(),
-            ],
-          ),
+        return Column(
+          children: [
+            _salesSummary(),
+            Expanded(child: _salesList()),
+            _paginationBar(),
+          ],
         );
       }),
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // ERROR STATE
-  // ---------------------------------------------------------------------------
-  Widget _buildErrorState() {
+  // ===========================================================================
+  // ERROR
+  // ===========================================================================
+  Widget _errorState() {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, size: 80, color: Colors.red.shade300),
+          Icon(Icons.error_outline, size: 64, color: AppColors.errorColor),
           const SizedBox(height: 16),
-          Text(controller.errorMessage.value,
-              style: const TextStyle(fontSize: 16)),
+          Text(controller.errorMessage.value),
           const SizedBox(height: 16),
           ElevatedButton(
-            onPressed: () => controller.fetchSales(),
+            onPressed: controller.fetchSales,
             child: const Text('Retry'),
           ),
         ],
@@ -78,258 +119,186 @@ class AdminSalesView extends GetView<AdminSalesController> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // FILTER CHIPS
-  // ---------------------------------------------------------------------------
-  Widget _buildFilterChips() {
-    return Obx(() {
-      final hasFilters =
-          controller.selectedStartDate.value != null ||
-              controller.selectedEndDate.value != null ||
-              controller.selectedCashier.value != null ||
-              controller.selectedPlatform.value != null;
+  // ===========================================================================
+// SALES SUMMARY (PRIMARY BACKGROUND)
+// ===========================================================================
+  Widget _salesSummary() {
+    final totalSales = controller.salesList.fold<double>(
+      0,
+          (sum, s) => sum + s.totalPrice,
+    );
 
-      if (!hasFilters) return const SizedBox.shrink();
-
-      return Container(
-        padding: const EdgeInsets.all(12),
-        margin: const EdgeInsets.only(bottom: 6),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
-        ),
-        child: Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            if (controller.selectedStartDate.value != null)
-              _buildFilterChip(
-                'From: ${DateFormat('dd MMM yyyy').format(controller.selectedStartDate.value!)}',
-                    () => controller.applyFilters(startDate: null),
-              ),
-            if (controller.selectedEndDate.value != null)
-              _buildFilterChip(
-                'To: ${DateFormat('dd MMM yyyy').format(controller.selectedEndDate.value!)}',
-                    () => controller.applyFilters(endDate: null),
-              ),
-            if (controller.selectedCashier.value != null)
-              // _buildFilterChip(
-              //   'Cashier: ${controller.selectedCashierName}',
-              //       () => controller.applyFilters(cashierId: null),
-              // ),
-            if (controller.selectedPlatform.value != null)
-              _buildFilterChip(
-                'Platform: ${controller.selectedPlatform.value}',
-                    () => controller.applyFilters(platform: null),
-              ),
-
-            // CLEAR ALL
-            TextButton.icon(
-              onPressed: () => controller.clearFilters(),
-              icon: const Icon(Icons.clear_all, size: 16),
-              label: const Text("Clear All"),
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.red,
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-              ),
-            ),
-          ],
-        ),
-      );
-    });
-  }
-
-  Widget _buildFilterChip(String label, VoidCallback onDeleted) {
-    return Chip(
-      labelPadding: const EdgeInsets.only(left: 10, right: 4),
-      backgroundColor: AppColors.primary.withOpacity(0.12),
-      label: Text(label, style: const TextStyle(fontSize: 12)),
-      deleteIcon: const Icon(Icons.close, size: 16),
-      onDeleted: onDeleted,
-      shape: StadiumBorder(
-        side: BorderSide(color: AppColors.primary),
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.primary, // ✅ PRIMARY BACKGROUND
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.35),
+            blurRadius: 10,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          _summaryItem(
+            title: 'Total Orders',
+            value: controller.salesList.length.toString(),
+            icon: Icons.receipt_long,
+          ),
+          const Spacer(),
+          _summaryItem(
+            title: 'Total Sales',
+            value: '\$${controller.formatCurrency(totalSales)}',
+            icon: Icons.payments,
+          ),
+        ],
       ),
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // STATISTICS (TOP SUMMARY)
-  // ---------------------------------------------------------------------------
-  Widget _buildSalesStats() {
-    return Obx(() {
-      final totalSales =
-      controller.salesList.fold(0.0, (sum, sale) => sum + sale.totalPrice);
-
-      return Container(
-        margin: const EdgeInsets.all(16),
-        padding: const EdgeInsets.all(18),
-        decoration: AppColors.cardDecoration(),
-        child: Row(
-          children: [
-            Expanded(
-              child: _buildStatTile(
-                label: "Total Sales",
-                value: "\$${controller.formatCurrency(totalSales)}",
-                icon: Icons.monetization_on,
-                color: AppColors.success,
-              ),
-            ),
-            Container(width: 1, height: 50, color: Colors.grey.shade300),
-            Expanded(
-              child: _buildStatTile(
-                label: "Orders",
-                value: controller.salesList.length.toString(),
-                icon: Icons.receipt_long,
-                color: AppColors.primary,
-              ),
-            ),
-          ],
-        ),
-      );
-    });
-  }
-
-  Widget _buildStatTile({
-    required String label,
+// ===========================================================================
+// SUMMARY ITEM
+// ===========================================================================
+  Widget _summaryItem({
+    required String title,
     required String value,
     required IconData icon,
-    required Color color,
   }) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 32, color: color),
-        const SizedBox(height: 6),
+        Icon(
+          icon,
+          color: Colors.white,
+          size: 28,
+        ),
+        const SizedBox(height: 8),
         Text(
           value,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: color,
+            color: Colors.white,
           ),
         ),
-        const SizedBox(height: 4),
-        Text(label,
-            style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+        const SizedBox(height: 2),
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.white.withOpacity(0.85),
+          ),
+        ),
       ],
     );
   }
 
-  // ---------------------------------------------------------------------------
+
+  // ===========================================================================
   // SALES LIST
-  // ---------------------------------------------------------------------------
-  Widget _buildSalesList() {
+  // ===========================================================================
+  Widget _salesList() {
     return Obx(() {
       if (controller.salesList.isEmpty) {
-        return Center(
-          child: Column(
-            children: [
-              const SizedBox(height: 100),
-              Icon(Icons.receipt_long, size: 80, color: Colors.grey.shade400),
-              const SizedBox(height: 16),
-              Text("No sales found",
-                  style: TextStyle(color: Colors.grey.shade600)),
-            ],
-          ),
-        );
+        return const Center(child: Text('No sales found'));
       }
 
-      return ListView.separated(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      return ListView.builder(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         itemCount: controller.salesList.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 12),
-        itemBuilder: (_, index) {
-          return _buildSaleCard(controller.salesList[index]);
-        },
+        itemBuilder: (_, i) => _saleCard(controller.salesList[i]),
       );
     });
   }
 
-  // ---------------------------------------------------------------------------
-  // SALE CARD UI (Premium UI)
-  // ---------------------------------------------------------------------------
-  Widget _buildSaleCard(sale) {
+  // ===========================================================================
+  // SALE CARD
+  // ===========================================================================
+  Widget _saleCard(sale) {
     return Container(
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: AppColors.cardDecoration(),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: () => _showSaleDetails(sale),
+        onTap: () => _openActionSheet(sale),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(14),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
-              // RECEIPT NUMBER + PLATFORM BADGE
+              // RECEIPT + PLATFORM
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [AppColors.primary, AppColors.primary.withOpacity(0.6)],
-                      ),
+                      color: AppColors.primary,
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
-                      "#${sale.receiptNumber}",
+                      '#${sale.receiptNumber}',
                       style: const TextStyle(
-                        color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        fontSize: 12,
+                        color: AppColors.darkTextPrimary,
                       ),
                     ),
                   ),
                   const Spacer(),
-                  _buildPlatformBadge(sale.platform),
-                ],
-              ),
-
-              const SizedBox(height: 14),
-
-              // CASHIER AVATAR + NAME + TOTAL PRICE
-              Row(
-                children: [
-                  CircleAvatar(
-                    radius: 18,
-                    backgroundImage: NetworkImage(
-                      AppConfig.getImageUrl(sale.cashier.avatar),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    sale.cashier.name,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const Spacer(),
-                  Text(
-                    "\$${controller.formatCurrency(sale.totalPrice)}",
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.success,
-                    ),
-                  ),
+                  _platformBadge(sale.platform),
                 ],
               ),
 
               const SizedBox(height: 10),
 
-              // TIME + ITEMS COUNT
+              // CASHIER + TOTAL
               Row(
                 children: [
-                  Icon(Icons.access_time, size: 16, color: Colors.grey.shade500),
+                  CircleAvatar(
+                    radius: 16,
+                    backgroundImage:
+                    NetworkImage(AppConfig.getImageUrl(sale.cashier.avatar)),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      sale.cashier.name,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  Text(
+                    '\$${controller.formatCurrency(sale.totalPrice)}',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.successColor,
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 6),
+
+              // TIME + ITEMS
+              Row(
+                children: [
+                  Icon(Icons.access_time,
+                      size: 14, color: AppColors.textSecondary),
                   const SizedBox(width: 4),
                   Text(
                     controller.formatDate(sale.orderedAt),
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                    style:
+                    TextStyle(fontSize: 12, color: AppColors.textSecondary),
                   ),
                   const Spacer(),
                   Text(
-                    "${sale.details.length} items",
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                    '${sale.details.length} items',
+                    style:
+                    TextStyle(fontSize: 12, color: AppColors.textSecondary),
                   ),
                 ],
               ),
@@ -340,38 +309,166 @@ class AdminSalesView extends GetView<AdminSalesController> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // PLATFORM BADGE
-  // ---------------------------------------------------------------------------
-  Widget _buildPlatformBadge(String platform) {
-    final p = platform.toLowerCase();
-    Color color = Colors.grey;
-    IconData icon = Icons.devices;
+  // ===========================================================================
+  // ACTION BOTTOM SHEET
+  // ===========================================================================
+  void _openActionSheet(sale) {
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: AppColors.darkTextPrimary,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _sheetHandle(),
 
-    if (p == "web") {
-      color = AppColors.infoColor;
-      icon = Icons.language;
-    } else if (p == "mobile") {
-      color = AppColors.success;
-      icon = Icons.phone_android;
-    }
+              _sheetItem(
+                icon: Icons.visibility,
+                title: 'View Sale Detail',
+                onTap: () {
+                  Get.back();
+                  Get.toNamed(Routes.SALE_DETAIL, arguments: sale.id);
+                },
+              ),
+
+              // _sheetItem(
+              //   icon: Icons.picture_as_pdf,
+              //   title: 'View Receipt',
+              //   onTap: () async {
+              //     Get.back();
+              //     final pdf =
+              //     await controller.getOrderInvoice(sale.receiptNumber);
+              //     if (pdf != null) {
+              //       _openPdfPreview(pdf, sale.receiptNumber);
+              //     }
+              //   },
+              // ),
+
+              _sheetItem(
+                icon: Icons.delete,
+                title: 'Delete Sale',
+                color: AppColors.errorColor,
+                onTap: () {
+                  Get.back();
+                  _confirmDelete(sale.id);
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+      backgroundColor: Colors.transparent,
+    );
+  }
+
+  // ===========================================================================
+  // PAGINATION BAR
+  // ===========================================================================
+  Widget _paginationBar() {
+    return Obx(() {
+      final p = controller.pagination.value;
+      if (p == null || p.totalPage <= 1) return const SizedBox.shrink();
+
+      return Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AppColors.darkTextPrimary,
+          border: Border(top: BorderSide(color: AppColors.primary, width: 0)),
+        ),
+        child: Row(
+          children: [
+            Text(
+              'Page ${controller.currentPage.value} / ${p.totalPage}',
+              style: TextStyle(color: AppColors.primary, fontSize: 14),
+            ),
+            const Spacer(),
+            IconButton(
+              icon: const Icon(Icons.chevron_left),
+              onPressed: controller.currentPage.value > 1
+                  ? () => controller.changePage(
+                controller.currentPage.value - 1,
+              )
+                  : null,
+            ),
+            IconButton(
+              icon: const Icon(Icons.chevron_right),
+              onPressed: controller.currentPage.value < p.totalPage
+                  ? () => controller.changePage(
+                controller.currentPage.value + 1,
+              )
+                  : null,
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+
+  // ===========================================================================
+  // HELPERS
+  // ===========================================================================
+  Widget _sheetItem({
+    required IconData icon,
+    required String title,
+    Color? color,
+    required VoidCallback onTap,
+  }) {
+    final c = color ?? AppColors.primaryColor;
+    return ListTile(
+      leading: Icon(icon, color: c),
+      title: Text(title,
+          style: TextStyle(color: c, fontWeight: FontWeight.w600)),
+      onTap: onTap,
+    );
+  }
+
+  Widget _sheetHandle() {
+    return Container(
+      width: 40,
+      height: 5,
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade600,
+        borderRadius: BorderRadius.circular(10),
+      ),
+    );
+  }
+
+  Widget _platformBadge(String platform) {
+    final p = platform.toLowerCase();
+    final isWeb = p == 'web';
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.15),
+        color: (isWeb
+            ? AppColors.infoColor
+            : AppColors.successColor)
+            .withOpacity(0.2),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 12, color: color),
+          Icon(
+            isWeb ? Icons.language : Icons.phone_android,
+            size: 12,
+            color:
+            isWeb ? AppColors.infoColor : AppColors.successColor,
+          ),
           const SizedBox(width: 4),
           Text(
             platform,
             style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.bold,
-              color: color,
+              color: isWeb
+                  ? AppColors.infoColor
+                  : AppColors.successColor,
             ),
           ),
         ],
@@ -379,187 +476,54 @@ class AdminSalesView extends GetView<AdminSalesController> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // PAGINATION BAR
-  // ---------------------------------------------------------------------------
-  Widget _buildPagination() {
-    return Obx(() {
-      final p = controller.pagination.value;
-      if (p == null || p.totalPage <= 1) {
-        return const SizedBox.shrink();
-      }
-
-      return Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: Colors.grey.shade300)),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              "Page ${controller.currentPage.value} of ${p.totalPage}",
-              style: TextStyle(color: Colors.grey.shade600),
+  // ===========================================================================
+  // DELETE
+  // ===========================================================================
+  void _confirmDelete(int id) {
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Delete Sale'),
+        content: const Text('Are you sure?'),
+        actions: [
+          TextButton(onPressed: Get.back, child: const Text('Cancel')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.errorColor,
             ),
-            Row(
-              children: [
-                IconButton(
-                  onPressed: controller.currentPage.value > 1
-                      ? () => controller.changePage(controller.currentPage.value - 1)
-                      : null,
-                  icon: const Icon(Icons.chevron_left),
-                ),
-                IconButton(
-                  onPressed: controller.currentPage.value < p.totalPage
-                      ? () => controller.changePage(controller.currentPage.value + 1)
-                      : null,
-                  icon: const Icon(Icons.chevron_right),
-                ),
-              ],
-            )
-          ],
-        ),
-      );
-    });
+            onPressed: () async {
+              Get.back();
+              await controller.deleteSale(id);
+            },
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
   }
 
-  // ---------------------------------------------------------------------------
-  // SALE DETAILS DIALOG
-  // ---------------------------------------------------------------------------
-  void _showSaleDetails(sale) {
-    Get.dialog(
-      Dialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Container(
-          padding: const EdgeInsets.all(22),
-          width: 450,
-          constraints: const BoxConstraints(maxHeight: 600),
-
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // HEADER
-              Row(
-                children: [
-                  Text(
-                    "Sale #${sale.receiptNumber}",
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const Spacer(),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Get.back(),
-                  ),
-                ],
-              ),
-
-              const Divider(height: 20),
-
-              // ITEMS LIST
-              Expanded(
-                child: ListView.separated(
-                  itemCount: sale.details.length,
-                  separatorBuilder: (_, __) => const Divider(height: 24),
-                  itemBuilder: (_, index) {
-                    final d = sale.details[index];
-                    return ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: NetworkImage(
-                          AppConfig.getImageUrl(d.product.image),
-                        ),
-                      ),
-                      title: Text(d.product.name),
-                      subtitle: Text(
-                        "${d.qty} × \$${controller.formatCurrency(d.unitPrice)}",
-                        style: const TextStyle(fontSize: 13),
-                      ),
-                      trailing: Text(
-                        "\$${controller.formatCurrency(d.subtotal)}",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-
-              const Divider(),
-
-              // TOTAL
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    "TOTAL",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    "\$${controller.formatCurrency(sale.totalPrice)}",
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.success,
-                    ),
-                  ),
-                ],
-              )
-            ],
+  // ===========================================================================
+  // PDF PREVIEW (TEMP)
+  // ===========================================================================
+  void _openPdfPreview(String base64Pdf, String receipt) {
+    final bytes = base64Decode(base64Pdf);
+    Get.to(
+          () => Scaffold(
+        appBar: AppBar(title: Text('Receipt #$receipt')),
+        body: Center(
+          child: Text(
+            'PDF Loaded (${bytes.length} bytes)\n\n'
+                'Integrate flutter_pdfview / Syncfusion here',
+            textAlign: TextAlign.center,
           ),
         ),
       ),
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // FILTER DIALOG
-  // ---------------------------------------------------------------------------
+  // ===========================================================================
+  // FILTER PLACEHOLDER
+  // ===========================================================================
   void _showFilterDialog() {
-    Get.dialog(
-      Dialog(
-        backgroundColor: Colors.white,
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          width: 400,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                "Filter Sales",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-
-              const SizedBox(height: 24),
-              const Text("Date Range, Cashier, Platform filters..."),
-
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => Get.back(),
-                    child: const Text("Cancel"),
-                  ),
-                  const SizedBox(width: 8),
-                  ElevatedButton(
-                    onPressed: () {
-                      Get.back();
-                      controller.fetchSales();
-                    },
-                    child: const Text("Apply"),
-                  )
-                ],
-              )
-            ],
-          ),
-        ),
-      ),
-    );
+    Get.snackbar('Filter', 'Filter dialog coming next');
   }
 }

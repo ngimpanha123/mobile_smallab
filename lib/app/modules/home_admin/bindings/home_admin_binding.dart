@@ -1,7 +1,9 @@
 import 'package:get/get.dart';
 import '../../admin/dashboard/controllers/admin_dashboard_controller.dart';
+import '../../admin/products/controllers/admin_products_controller.dart';
 import '../../admin/sales/controllers/admin_sales_controller.dart';
 import '../../admin/settings/controllers/admin_settings_controller.dart';
+import '../../admin/users/controllers/admin_users_controller.dart';
 import '../controllers/home_admin_controller.dart';
 
 class AdminHomeBinding extends Bindings {
@@ -12,8 +14,8 @@ class AdminHomeBinding extends Bindings {
     // Later you can put your admin module controllers here:
      Get.lazyPut<DashboardController>(() => DashboardController());
      Get.lazyPut<AdminSalesController>(() => AdminSalesController());
-    // Get.lazyPut<AdminProductController>(() => AdminProductController());
-    // Get.lazyPut<AdminUserController>(() => AdminUserController());
+     Get.lazyPut<AdminProductsController>(() => AdminProductsController());
+    Get.lazyPut<AdminUsersController>(() => AdminUsersController());
     // ✅ settings tab (this fixes your error)
     Get.lazyPut<AdminSettingsController>(() => AdminSettingsController());
   }

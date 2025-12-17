@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../constants/app_color.dart';
 import '../../admin/dashboard/views/admin_dashboard_view.dart';
 import '../../admin/products/views/admin_products_view.dart';
 import '../../admin/sales/views/admin_sales_view.dart';
@@ -29,7 +30,7 @@ class AdminHomeView extends GetView<AdminHomeController> {
           currentIndex: controller.tabIndex.value,
           onTap: controller.changeTab,
           type: BottomNavigationBarType.fixed,
-          selectedItemColor: Colors.blue,
+          selectedItemColor: AppColors.primary,
           unselectedItemColor: Colors.grey,
           items: const [
             BottomNavigationBarItem(

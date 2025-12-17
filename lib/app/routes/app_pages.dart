@@ -4,11 +4,15 @@ import '../modules/admin/dashboard/bindings/admin_dashboard_binding.dart';
 import '../modules/admin/dashboard/views/admin_dashboard_view.dart';
 import '../modules/admin/products/bindings/admin_products_binding.dart';
 import '../modules/admin/products/views/admin_products_view.dart';
+import '../modules/admin/products/views/product_types_view.dart';
+import '../modules/admin/products/widgets/product_form_page.dart';
+import '../modules/admin/products/widgets/product_type_form_page.dart';
 import '../modules/admin/sales/bindings/admin_sales_binding.dart';
 import '../modules/admin/sales/views/admin_sales_view.dart';
 import '../modules/admin/settings/bindings/admin_settings_binding.dart';
 import '../modules/admin/settings/views/admin_settings_view.dart';
 import '../modules/admin/users/bindings/admin_users_binding.dart';
+import '../modules/admin/users/views/admin_user_detail_view.dart';
 import '../modules/admin/users/views/admin_users_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
@@ -96,7 +100,6 @@ class AppPages {
         Get.lazyPut(() => ChangePasswordController());
       }),
     ),
-
     GetPage(
       name: Routes.LOGS,
       page: () => const LogsView(),
@@ -104,21 +107,15 @@ class AppPages {
         Get.lazyPut(() => LogsController());
       }),
     ),
-
     GetPage(
       name: Routes.LOGIN,
       page: () => const LoginView(),
       binding: LoginBinding(),
     ),
-    // GetPage(
-    //   name: Routes.ADMIN_DASHBOARD,
-    //   page: () => const DashboardView(),
-    //   binding: DashboardBinding(),
-    // ),
     GetPage(
-      name: Routes.ADMIN_PRODUCTS,
-      page: () => const AdminProductsView(),
-      binding: AdminProductsBinding(),
+      name: Routes.ADMIN_DASHBOARD,
+      page: () => const DashboardView(),
+      binding: DashboardBinding(),
     ),
     GetPage(
       name: Routes.ADMIN_SALES,
@@ -128,6 +125,11 @@ class AppPages {
     GetPage(
       name: Routes.ADMIN_USERS,
       page: () => const AdminUsersView(),
+      binding: AdminUsersBinding(),
+    ),
+    GetPage(
+      name: Routes.ADMIN_USER_DETAIL,
+      page: () => const AdminUserDetailView(),
       binding: AdminUsersBinding(),
     ),
     GetPage(
@@ -145,16 +147,49 @@ class AppPages {
       page: () => const KhqrView(),
       binding: KhqrBinding(),
     ),
-
     GetPage(
       name: "/user/khqr-success",
       page: () => KhqrSuccessView(),
     ),
-
     GetPage(
       name: "/user/khqr-expired",
       page: () => KhqrExpiredView(),
     ),
+    // ===================  Admin Product ================
+    GetPage(
+      name: Routes.ADMIN_PRODUCTS,
+      page: () => const AdminProductsView(),
+      binding: AdminProductsBinding(),
+    ),
+    GetPage(
+      name: Routes.ADMIN_PRODUCT_CREATE,
+      page: () => const ProductFormPage(),
+      binding: AdminProductsBinding(),
+    ),
 
+    GetPage(
+      name: Routes.ADMIN_PRODUCT_EDIT,
+      page: () => const ProductFormPage(),
+      binding: AdminProductsBinding(),
+    ),
+
+    // ================= ADMIN PRODUCT TYPES =================
+    GetPage(
+      name: Routes.ADMIN_PRODUCT_TYPES,
+      page: () => const ProductTypesView(),
+      binding: AdminProductsBinding(),
+    ),
+
+    GetPage(
+      name: Routes.ADMIN_PRODUCT_TYPE_CREATE,
+      page: () => const ProductTypeFormPage(),
+      binding: AdminProductsBinding(),
+    ),
+
+    GetPage(
+      name: Routes.ADMIN_PRODUCT_TYPE_EDIT,
+      page: () => const ProductTypeFormPage(),
+      binding: AdminProductsBinding(),
+    ),
   ];
 }

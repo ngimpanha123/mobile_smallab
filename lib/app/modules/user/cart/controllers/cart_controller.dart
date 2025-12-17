@@ -12,6 +12,12 @@ class CartController extends GetxController {
   var items = <ProductItem, int>{}.obs;
   var total = 0.obs;
 
+  @override
+  void onInit() {
+    super.onInit();
+    print("🛒 CartController INIT → $hashCode");
+  }
+
   // ------------------------------------------------------
   // ADD ITEM
   // ------------------------------------------------------
@@ -22,6 +28,7 @@ class CartController extends GetxController {
       items[product] = 1;
     }
     calculateTotal();
+    _recalculate();
   }
 
   // ------------------------------------------------------
@@ -36,6 +43,7 @@ class CartController extends GetxController {
       items[product] = items[product]! - 1;
     }
     calculateTotal();
+    _recalculate();
   }
 
   // ------------------------------------------------------
@@ -46,6 +54,7 @@ class CartController extends GetxController {
       items.remove(product);
     }
     calculateTotal();
+    _recalculate();
   }
 
 
@@ -63,6 +72,7 @@ class CartController extends GetxController {
       sum += (product.unitPrice ?? 0) * qty;
     });
     total(sum);
+    _recalculate();
   }
 
   // ------------------------------------------------------
@@ -81,6 +91,7 @@ class CartController extends GetxController {
     if (order != null) {
       Get.offNamed("/user/success", arguments: order);
     }
+    _recalculate();
   }
 
   // ------------------------------------------------------
@@ -116,5 +127,11 @@ class CartController extends GetxController {
       }
     }
     return 0;
+  }
+  void _recalculate() {
+    total.value = items.entries.fold(
+      0,
+          (sum, e) => sum + (e.key.unitPrice ?? 0) * e.value,
+    );
   }
 }

@@ -1,22 +1,29 @@
 import 'package:flutter/material.dart';
-import '../config/app_config.dart';
-import '../constants/app_color.dart';
-import '../constants/app_font_size.dart';
-import '../data/models/admin/product_model.dart';
+
+import '../../../../constants/app_color.dart';
+import '../../../../constants/app_font_size.dart';
+import '../../../../constants/app_spacing.dart';
+import '../../../../data/models/admin/product_model.dart';
 
 class ProductCardWidget extends StatelessWidget {
   final ProductData product;
 
-  const ProductCardWidget({super.key, required this.product});
+  const ProductCardWidget({
+    super.key,
+    required this.product,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        _image(),
-        const SizedBox(width: 12),
-        Expanded(child: _info()),
-      ],
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: AppSpacing.paddingS),
+      child: Row(
+        children: [
+          _image(),
+          SizedBox(width: AppSpacing.paddingM),
+          Expanded(child: _info()),
+        ],
+      ),
     );
   }
 
@@ -26,20 +33,13 @@ class ProductCardWidget extends StatelessWidget {
       child: Container(
         width: 48,
         height: 48,
-        color: AppColors.lightSurface, // fallback background
+        color: AppColors.lightSurface,
         child: product.image != null && product.image!.isNotEmpty
             ? Image.network(
-          AppConfig.getImageUrl(product.image!),
+          product.image!,
           fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => const Icon(
-            Icons.image,
-            color: Colors.grey,
-          ),
         )
-            : const Icon(
-          Icons.image,
-          color: Colors.grey,
-        ),
+            : const Icon(Icons.image_not_supported),
       ),
     );
   }
@@ -55,6 +55,7 @@ class ProductCardWidget extends StatelessWidget {
             color: AppColors.greyColor,
           ),
         ),
+        const SizedBox(height: 4),
         Text(
           product.name ?? '',
           style: TextStyle(
@@ -62,6 +63,7 @@ class ProductCardWidget extends StatelessWidget {
             fontWeight: FontWeight.w600,
           ),
         ),
+        const SizedBox(height: 4),
         Text(
           '${product.unitPrice ?? 0} ៛',
           style: TextStyle(

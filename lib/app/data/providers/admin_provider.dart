@@ -1,44 +1,3 @@
-// // lib/app/data/providers/admin_provider.dart
-// import 'package:dio/dio.dart';
-// import 'package:get/get.dart' hide Response;
-//
-// class AdminProvider extends GetxService {
-//   final Dio dio;
-//
-//   AdminProvider(this.dio);
-//
-//   /// GET /api/admin/dashboard
-//   Future<Response> getDashboard() async {
-//     return await dio.get("/api/admin/dashboard");
-//   }
-//
-//   /// GET /api/admin/dashboard/cashier
-//   Future<Response> getTopCashiers() async {
-//     return await dio.get("/api/admin/dashboard/cashier");
-//   }
-//
-//   /// GET /api/admin/dashboard/product-type
-//   Future<Response> getProductTypeChart({
-//     required int week,
-//     required int year,
-//   }) async {
-//     return await dio.get(
-//       "/api/admin/dashboard/product-type",
-//       queryParameters: {"week": week, "year": year},
-//     );
-//   }
-//
-//   /// GET /api/admin/dashboard/data-sale
-//   Future<Response> getSaleData({
-//     required String sixMonthsAgo,
-//   }) async {
-//     return await dio.get(
-//       "/api/admin/dashboard/data-sale",
-//       queryParameters: {"sixMonthAgo": sixMonthsAgo},
-//     );
-//   }
-// }
-
 import 'package:dio/dio.dart';
 import 'package:get/get.dart' hide Response;
 import '../services/storage_service.dart';
@@ -57,45 +16,7 @@ class AdminProvider {
 
   AdminProvider(Dio dio);
 
-  Future<Response> login({
-    required String username,
-    required String password,
-    required String platform,
-  }) async {
-    try {
-      // ✅ Corrected API endpoint
-      final response = await _dio.post(
-        '/account/auth/login',
-        data: {
-          'username': username,
-          'password': password,
-          'platform': platform,
-        },
-        options: Options(
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
-        ),
-      );
-      return response;
-    } on DioException catch (e) {
-      if (e.response != null) {
-        throw Exception(
-          "Server error: ${e.response?.statusCode} - ${e.response?.data}",
-        );
-      } else {
-        throw Exception("Network error: ${e.message}");
-      }
-    } catch (e) {
-      throw Exception("Unexpected error: $e");
-    }
-  }
 
-  // ✅ Get Products
-  /// Fetch products with optional pagination
-  /// Set [limit] to a high number (e.g., 1000) to get all products
-  /// Set [page] for pagination (default: 1)
   Future<Response> getProducts({bool getAll = false, int? page, int? limit}) async {
     try {
       final storage = Get.find<StorageService>();
@@ -143,18 +64,29 @@ class AdminProvider {
 
 
   // ✅ Get Dashboard Data
-  Future<Response> getDashboard({required String today}) async {
+  Future<Response> getDashboard({
+    String? today,
+    String? yesterday,
+    String? lastWeek,
+    String? threeMonth,
+    String? sixMonth,
+  }) async {
     try {
-      final storage = Get.find<StorageService>();
-      final token = storage.readToken();
+      final token = Get.find<StorageService>().readToken();
+
+      final query = {
+        if (today != null) 'today': today,
+        if (yesterday != null) 'yesterday': yesterday,
+        if (lastWeek != null) 'lastWeek': lastWeek,
+        if (threeMonth != null) 'threeMonth': threeMonth,
+        if (sixMonth != null) 'sixMonth': sixMonth,
+      };
 
       return await _dio.get(
         '/admin/dashboard',
-        queryParameters: {'today': today},
+        queryParameters: query,
         options: Options(
-          headers: {
-            'Authorization': 'Bearer $token',
-          },
+          headers: {'Authorization': 'Bearer $token'},
         ),
       );
     } catch (e) {
@@ -185,18 +117,21 @@ class AdminProvider {
   }
 
   // ✅ Get Product Type Data
-  Future<Response> getProductTypeData({required String thisMonth}) async {
+  Future<Response> getProductTypeData({
+    required int week,
+    required int year,
+  }) async {
     try {
-      final storage = Get.find<StorageService>();
-      final token = storage.readToken();
+      final token = Get.find<StorageService>().readToken();
 
       return await _dio.get(
         '/admin/dashboard/product-type',
-        queryParameters: {'thisMonth': thisMonth},
+        queryParameters: {
+          'week': week,
+          'year': year,
+        },
         options: Options(
-          headers: {
-            'Authorization': 'Bearer $token',
-          },
+          headers: {'Authorization': 'Bearer $token'},
         ),
       );
     } catch (e) {
@@ -206,17 +141,27 @@ class AdminProvider {
   }
 
   // ✅ Get Sales Data
-  Future<Response> getSalesData() async {
+  Future<Response> getSalesData({
+    String? thisWeek,
+    String? thisMonth,
+    String? threeMonthAgo,
+    String? sixMonthAgo,
+  }) async {
     try {
-      final storage = Get.find<StorageService>();
-      final token = storage.readToken();
+      final token = Get.find<StorageService>().readToken();
+
+      final query = {
+        if (thisWeek != null) 'thisWeek': thisWeek,
+        if (thisMonth != null) 'thisMonth': thisMonth,
+        if (threeMonthAgo != null) 'threeMonthAgo': threeMonthAgo,
+        if (sixMonthAgo != null) 'sixMonthAgo': sixMonthAgo,
+      };
 
       return await _dio.get(
         '/admin/dashboard/data-sale',
+        queryParameters: query,
         options: Options(
-          headers: {
-            'Authorization': 'Bearer $token',
-          },
+          headers: {'Authorization': 'Bearer $token'},
         ),
       );
     } catch (e) {
@@ -267,6 +212,7 @@ class AdminProvider {
       rethrow;
     }
   }
+
 
   /// Create a new product
   Future<Response> createProduct({

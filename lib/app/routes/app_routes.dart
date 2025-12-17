@@ -20,6 +20,17 @@ abstract class Routes {
   static const ADMIN_PRODUCTS = '/admin/products';
   static const ADMIN_SALES = '/admin/sales';
   static const ADMIN_USERS = '/admin/users';
+  static const ADMIN_USER_DETAIL = '/admin/users/detail';
   static const ADMIN_SETTINGS = '/admin/settings';
   static const USER_KHQR = '/user/khqr';
+
+  // ================ Admin Product ====================================
+
+  static const ADMIN_PRODUCT_DETAIL = '/admin/products/detail';
+  static const ADMIN_PRODUCT_CREATE = '/admin/products/create';
+  static const ADMIN_PRODUCT_EDIT = '/admin/products/edit';
+
+  static const ADMIN_PRODUCT_TYPES = '/admin/product-types';
+  static const ADMIN_PRODUCT_TYPE_CREATE = '/admin/product-types/create';
+  static const ADMIN_PRODUCT_TYPE_EDIT = '/admin/product-types/edit';
 }

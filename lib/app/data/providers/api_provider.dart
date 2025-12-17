@@ -7,7 +7,7 @@ import '../../routes/app_routes.dart';
 class APIProvider extends GetxService {
   late Dio dio;
 
-  static const String baseUrl = "http://10.0.2.2:3000";
+  static const String baseUrl = "http://10.0.2.2:9003/";
 
   APIProvider() {
     dio = Dio(

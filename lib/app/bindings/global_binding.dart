@@ -23,6 +23,8 @@ import '../data/providers/api_provider.dart';
 import '../data/providers/cashier_provider.dart';
 import '../data/providers/profile_provider.dart';
 import '../data/providers/admin_provider.dart';
+import '../data/repositories/khqr_repository.dart';
+import '../modules/user/cart/controllers/cart_controller.dart';
 
 class GlobalBinding extends Bindings {
   @override
@@ -31,10 +33,17 @@ class GlobalBinding extends Bindings {
     final api = Get.put(APIProvider(), permanent: true);
 
     // USER Providers
-    Get.put(CashierProvider(api.dio), permanent: true);
-    Get.put(ProfileProvider(api.dio), permanent: true);
+    Get.put<CashierProvider>(CashierProvider(api.dio), permanent: true);
+    Get.put<ProfileProvider>(ProfileProvider(api.dio), permanent: true);
 
     // ADMIN Provider
-    Get.put(AdminProvider(api.dio), permanent: true);
+    Get.put<AdminProvider>(AdminProvider(api.dio), permanent: true);
+
+    // ⭐ REGISTER REPO FIRST
+    Get.put<KhqrRepository>(KhqrRepository(), permanent: true);
+
+    // ⭐ THEN CART CONTROLLER
+    Get.put<CartController>(CartController(), permanent: true);
   }
 }
+

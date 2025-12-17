@@ -4,6 +4,7 @@ class AppSpacing {
   static RatioController get _ratio => RatioController.to;
 
   /// Padding
+  static double get paddingXXS => _ratio.scaledPadding(0);
   static double get paddingXS => _ratio.scaledPadding(4);
   static double get paddingS => _ratio.scaledPadding(8);
   static double get paddingSM => _ratio.scaledPadding(12);

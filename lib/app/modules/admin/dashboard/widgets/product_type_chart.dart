@@ -1,149 +1,144 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import '../../../../constants/app_color.dart';
 import '../../../../data/models/admin/dashboard_model.dart';
-
 
 class ProductTypeChart extends StatelessWidget {
   final ProductTypeData productTypeData;
 
   const ProductTypeChart({
-    Key? key,
+    super.key,
     required this.productTypeData,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    final total = productTypeData.data.fold<int>(0, (sum, value) => sum + value);
+    final theme = Theme.of(context);
+    final total = productTypeData.data.fold<int>(0, (s, v) => s + v);
 
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.1),
-            spreadRadius: 1,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
+            color: theme.shadowColor.withOpacity(0.08),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'ប្រភេទផលិតផល',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Row(
-                children: [
-                  Text(
-                    'ស្ថានភាព៖',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Icon(Icons.calendar_today, size: 16, color: Colors.grey[600]),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          // Donut Chart
-          SizedBox(
-            height: 250,
-            child: Stack(
-              alignment: Alignment.center,
+          _buildHeader(theme),
+          const SizedBox(height: 16),
+
+          /// ✅ SCROLLABLE CONTENT (CHART + LEGEND)
+          SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Column(
               children: [
-                PieChart(
-                  PieChartData(
-                    sectionsSpace: 2,
-                    centerSpaceRadius: 70,
-                    sections: _buildPieChartSections(),
-                  ),
-                ),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      'Total',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      total.toString(),
-                      style: const TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
+                _buildChart(theme, total),
+                const SizedBox(height: 20),
+                _buildLegend(theme),
               ],
             ),
-          ),
-          const SizedBox(height: 24),
-          // Legend
-          Wrap(
-            spacing: 16,
-            runSpacing: 12,
-            children: productTypeData.labels.asMap().entries.map((entry) {
-              final index = entry.key;
-              final label = entry.value;
-              final value = productTypeData.data[index];
-              final color = _getColor(index);
-              
-              return Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 12,
-                    height: 12,
-                    decoration: BoxDecoration(
-                      color: color,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    '$label ($value)',
-                    style: const TextStyle(fontSize: 13),
-                  ),
-                ],
-              );
-            }).toList(),
           ),
         ],
       ),
     );
   }
 
-  List<PieChartSectionData> _buildPieChartSections() {
-    final total = productTypeData.data.fold<int>(0, (sum, value) => sum + value);
+  // ================= HEADER =================
 
+  Widget _buildHeader(ThemeData theme) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          'Product Types',
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        Row(
+          children: [
+            Text(
+              'This Month',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.primary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Icon(
+              Icons.calendar_today,
+              size: 16,
+              color: theme.colorScheme.primary,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  // ================= CHART =================
+
+  Widget _buildChart(ThemeData theme, int total) {
+    return SizedBox(
+      height: 240,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          PieChart(
+            PieChartData(
+              sectionsSpace: 4,
+              centerSpaceRadius: 80,
+              startDegreeOffset: -90,
+              sections: _buildSections(theme, total),
+            ),
+            swapAnimationDuration: const Duration(milliseconds: 900),
+            swapAnimationCurve: Curves.easeOutCubic,
+          ),
+
+          /// CENTER TEXT
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Total',
+                style: theme.textTheme.bodySmall,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                total.toString(),
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<PieChartSectionData> _buildSections(
+      ThemeData theme,
+      int total,
+      ) {
     if (total == 0) {
       return [
         PieChartSectionData(
-          color: Colors.grey[300],
-          value: 100,
-          title: '100%',
-          radius: 50,
-          titleStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
+          color: theme.dividerColor,
+          value: 1,
+          title: '0%',
+          radius: 56,
+          titleStyle: theme.textTheme.labelLarge?.copyWith(
             color: Colors.white,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ];
@@ -155,26 +150,61 @@ class ProductTypeChart extends StatelessWidget {
       final percentage = (value / total) * 100;
 
       return PieChartSectionData(
-        color: _getColor(index),
+        color: _chartColors[index % _chartColors.length],
         value: value.toDouble(),
-        title: '${percentage.toStringAsFixed(1)}%',
-        radius: 50,
-        titleStyle: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
+        radius: 56,
+        title: '${percentage.toStringAsFixed(0)}%',
+        titleStyle: theme.textTheme.labelLarge?.copyWith(
           color: Colors.white,
+          fontWeight: FontWeight.bold,
         ),
       );
     }).toList();
   }
 
-  Color _getColor(int index) {
-    final colors = [
-      const Color(0xFFCDDC39), // Lime - Food-Meat
-      const Color(0xFF4CAF50), // Green - Alcohol
-      const Color(0xFF81C784), // Light Green - Beverage
-      const Color(0xFF2196F3), // Blue
-    ];
-    return colors[index % colors.length];
+  // ================= LEGEND =================
+
+  Widget _buildLegend(ThemeData theme) {
+    return Wrap(
+      spacing: 16,
+      runSpacing: 12,
+      children: productTypeData.labels.asMap().entries.map((entry) {
+        final index = entry.key;
+        final label = entry.value;
+        final value = productTypeData.data[index];
+
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                color: _chartColors[index % _chartColors.length],
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              '$label ($value)',
+              style: theme.textTheme.bodySmall,
+            ),
+          ],
+        );
+      }).toList(),
+    );
   }
 }
+
+// ================= COLORS =================
+
+const List<Color> _chartColors = [
+  Color(0xFF6C4DE6), // Purple
+  Color(0xFF5B8DEF), // Blue
+  Color(0xFFFFB020), // Orange
+  Color(0xFF10B981), // Green
+  Color(0xFFEF4444), // Red
+  Color(0xFF9C27B0), // Violet
+  Color(0xFF03A9F4), // Light Blue
+  Color(0xFF795548), // Brown
+];

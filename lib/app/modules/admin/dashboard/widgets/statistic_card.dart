@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../../../../constants/app_color.dart';
 
-
 class StatisticCard extends StatelessWidget {
   final IconData? icon;
-  final String? imagePath; // ✅ optional image instead of icon
+  final String? imagePath;
   final String label;
+  final Color? labelColor; // ✅ nullable
   final String value;
   final String? subtitle;
   final Color iconColor;
@@ -14,9 +14,10 @@ class StatisticCard extends StatelessWidget {
 
   const StatisticCard({
     Key? key,
-    this.icon, // optional now
-    this.imagePath, // new parameter
+    this.icon,
+    this.imagePath,
     required this.label,
+    this.labelColor, // ✅ optional now
     required this.value,
     this.subtitle,
     this.iconColor = Colors.blue,
@@ -25,6 +26,8 @@ class StatisticCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -32,7 +35,7 @@ class StatisticCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.1),
+            color: Colors.grey.withOpacity(0.1),
             spreadRadius: 1,
             blurRadius: 4,
             offset: const Offset(0, 2),
@@ -47,7 +50,7 @@ class StatisticCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: iconColor.withValues(alpha: 0.1),
+                  color: iconColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: imagePath != null
@@ -55,7 +58,7 @@ class StatisticCard extends StatelessWidget {
                   imagePath!,
                   width: 24,
                   height: 24,
-                  color: iconColor, // tint optional
+                  color: iconColor,
                 )
                     : Icon(
                   icon,
@@ -75,6 +78,8 @@ class StatisticCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
+
+          // VALUE
           Text(
             value,
             style: const TextStyle(
@@ -83,13 +88,18 @@ class StatisticCard extends StatelessWidget {
               color: Colors.black87,
             ),
           ),
+
           const SizedBox(height: 4),
+
+          // ✅ LABEL COLOR FALLBACK
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
-              color: Colors.black,
               fontWeight: FontWeight.bold,
+              color: labelColor ??
+                  theme.textTheme.bodyMedium?.color ??
+                  AppColors.primary,
             ),
           ),
         ],

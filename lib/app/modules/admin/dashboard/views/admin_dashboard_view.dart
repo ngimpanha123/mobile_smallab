@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../../constants/app_color.dart';
 import '../controllers/admin_dashboard_controller.dart';
 import '../widgets/cashier_section_with_toggles.dart';
 import '../widgets/dashboard_carousel_widget.dart';
@@ -19,6 +20,9 @@ class DashboardView extends GetView<DashboardController> {
       //drawer: const AppDrawer(),
       appBar: AppBar(
         backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          side: BorderSide(color: AppColors.primary.withOpacity(0.2)),
+        ),
         elevation: 0,
         title: const Text(
           'Dashboard',

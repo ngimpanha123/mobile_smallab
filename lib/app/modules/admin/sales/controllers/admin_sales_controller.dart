@@ -4,6 +4,7 @@ import '../../../../data/models/admin/sale_model.dart';
 import '../../../../data/models/admin/sales_setup_model.dart';
 import '../../../../data/providers/admin_provider.dart';
 
+
 class AdminSalesController extends GetxController {
   final _api = Get.find<AdminProvider>();
 
