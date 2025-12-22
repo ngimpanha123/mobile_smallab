@@ -27,31 +27,27 @@ All screenshots are located in the `/assets/ui/` directory.
 
 ## 🖼 App UI Preview
 
-### 🌟 Main Screens
-
 <p align="center">
-  <img src="https://raw.githubusercontent.com/ngimpanha123/mobile_smallab/eshop/assets/ui/img.png" width="260" />
-  <img src="https://raw.githubusercontent.com/ngimpanha123/mobile_smallab/eshop/assets/ui/image_1.png" width="260" />
-</p>
-
----
-
-### 📱 More Screens
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/ngimpanha123/mobile_smallab/eshop/assets/ui/image_2.png" width="200" />
-  <img src="https://raw.githubusercontent.com/ngimpanha123/mobile_smallab/eshop/assets/ui/image_3.png" width="200" />
-  <img src="https://raw.githubusercontent.com/ngimpanha123/mobile_smallab/eshop/assets/ui/image_4.png" width="200" />
-  <img src="https://raw.githubusercontent.com/ngimpanha123/mobile_smallab/eshop/assets/ui/image_5.png" width="200" />
+  <img src="https://raw.githubusercontent.com/ngimpanha123/mobile_smallab/eshop/assets/ui/img.png" width="230" />
+  <img src="https://raw.githubusercontent.com/ngimpanha123/mobile_smallab/eshop/assets/ui/image_1.png" width="230" />
+  <img src="https://raw.githubusercontent.com/ngimpanha123/mobile_smallab/eshop/assets/ui/image_2.png" width="230" />
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/ngimpanha123/mobile_smallab/eshop/assets/ui/image_6.png" width="200" />
-  <img src="https://raw.githubusercontent.com/ngimpanha123/mobile_smallab/eshop/assets/ui/image_7.png" width="200" />
-  <img src="https://raw.githubusercontent.com/ngimpanha123/mobile_smallab/eshop/assets/ui/image_8.png" width="200" />
-  <img src="https://raw.githubusercontent.com/ngimpanha123/mobile_smallab/eshop/assets/ui/image_9.png" width="200" />
+  <img src="https://raw.githubusercontent.com/ngimpanha123/mobile_smallab/eshop/assets/ui/image_3.png" width="230" />
+  <img src="https://raw.githubusercontent.com/ngimpanha123/mobile_smallab/eshop/assets/ui/image_4.png" width="230" />
+  <img src="https://raw.githubusercontent.com/ngimpanha123/mobile_smallab/eshop/assets/ui/image_5.png" width="230" />
 </p>
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/ngimpanha123/mobile_smallab/eshop/assets/ui/image_6.png" width="230" />
+  <img src="https://raw.githubusercontent.com/ngimpanha123/mobile_smallab/eshop/assets/ui/image_7.png" width="230" />
+  <img src="https://raw.githubusercontent.com/ngimpanha123/mobile_smallab/eshop/assets/ui/image_8.png" width="230" />
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/ngimpanha123/mobile_smallab/eshop/assets/ui/image_9.png" width="230" />
+</p>
 
 
 ---
