@@ -1,16 +1,83 @@
-# mobile_eshop
+# 📱 Mobile E-Shop (Flutter)
 
-A new Flutter project.
+A modern **Flutter mobile e-commerce application** showcasing a clean UI and basic shopping flow such as browsing products and managing a cart.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## 📌 Project Description
 
-A few resources to get you started if this is your first Flutter project:
+**Mobile E-Shop** is a Flutter-based project designed for learning and demonstration purposes.  
+It focuses on UI design and app structure for a mobile shopping application.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+---
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## ✨ Features
+
+- 🛍 Product listing UI
+- 🛒 Shopping cart UI
+- 📱 Responsive mobile design
+- 🎨 Clean Material Design
+- ⚡ Fast and smooth navigation
+
+---
+
+## 🖼 App Screenshots
+
+All screenshots are located in the `/assets/ui/` directory.
+
+### 🔹 UI Preview
+
+<p align="center">
+  <img src="assets/ui/image.png" width="250"/>
+  <img src="assets/ui/image_1.png" width="250"/>
+  <img src="assets/ui/image_2.png" width="250"/>
+</p>
+
+<p align="center">
+  <img src="assets/ui/image_3.png" width="250"/>
+  <img src="assets/ui/image_4.png" width="250"/>
+  <img src="assets/ui/image_5.png" width="250"/>
+</p>
+
+<p align="center">
+  <img src="assets/ui/image_6.png" width="250"/>
+  <img src="assets/ui/image_7.png" width="250"/>
+  <img src="assets/ui/image_8.png" width="250"/>
+</p>
+
+<p align="center">
+  <img src="assets/ui/image_9.png" width="250"/>
+</p>
+
+---
+
+## 🛠 Tech Stack
+
+- **Flutter**
+- **Dart**
+- **Material UI**
+
+---
+
+## 📂 Project Structure
+
+```text
+lib/
+ ├── main.dart
+ ├── screens/
+ ├── widgets/
+ ├── models/
+ └── services/
+
+assets/
+ └── ui/
+      ├── image.png
+      ├── image_1.png
+      ├── image_2.png
+      ├── image_3.png
+      ├── image_4.png
+      ├── image_5.png
+      ├── image_6.png
+      ├── image_7.png
+      ├── image_8.png
+      └── image_9.png
