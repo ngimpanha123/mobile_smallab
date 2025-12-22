@@ -28,7 +28,7 @@ All screenshots are located in the `/assets/ui/` directory.
 ### 🔹 UI Preview
 
 <p align="center">
-  <img src="./assets/ui/image.png" width="250"/>
+  <img src="https://github.com/ngimpanha123/mobile_smallab/blob/eshop/assets/ui/img.png" width="250"/>
   <img src="./assets/ui/image_1.png" width="250"/>
   <img src="./assets/ui/image_2.png" width="250"/>
 </p>
