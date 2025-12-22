@@ -28,26 +28,27 @@ All screenshots are located in the `/assets/ui/` directory.
 ### 🔹 UI Preview
 
 <p align="center">
-  <img src="assets/ui/image.png" width="250"/>
-  <img src="assets/ui/image_1.png" width="250"/>
-  <img src="assets/ui/image_2.png" width="250"/>
+  <img src="./assets/ui/image.png" width="250"/>
+  <img src="./assets/ui/image_1.png" width="250"/>
+  <img src="./assets/ui/image_2.png" width="250"/>
 </p>
 
 <p align="center">
-  <img src="assets/ui/image_3.png" width="250"/>
-  <img src="assets/ui/image_4.png" width="250"/>
-  <img src="assets/ui/image_5.png" width="250"/>
+  <img src="./assets/ui/image_3.png" width="250"/>
+  <img src="./assets/ui/image_4.png" width="250"/>
+  <img src="./assets/ui/image_5.png" width="250"/>
 </p>
 
 <p align="center">
-  <img src="assets/ui/image_6.png" width="250"/>
-  <img src="assets/ui/image_7.png" width="250"/>
-  <img src="assets/ui/image_8.png" width="250"/>
+  <img src="./assets/ui/image_6.png" width="250"/>
+  <img src="./assets/ui/image_7.png" width="250"/>
+  <img src="./assets/ui/image_8.png" width="250"/>
 </p>
 
 <p align="center">
-  <img src="assets/ui/image_9.png" width="250"/>
+  <img src="./assets/ui/image_9.png" width="250"/>
 </p>
+
 
 ---
 
